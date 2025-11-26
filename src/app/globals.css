@@ -24,3 +24,27 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbar for horizontal overflow */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Swiper pagination bullets - dark theme */
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.2) !important;
+  opacity: 1 !important;
+}
+.swiper-pagination-bullet-active {
+  background: #facc15 !important; /* tailwind yellow-400 */
+}
