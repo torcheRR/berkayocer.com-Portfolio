@@ -8,7 +8,7 @@ import { FaXTwitter, FaInstagram } from "react-icons/fa6";
 
 export default function Sidebar() {
   return (
-    <aside className="w-full lg:w-[360px] lg:max-w-[360px] bg-black/40 border border-white/10 rounded-2xl p-6 lg:p-8 shadow-xl backdrop-blur-sm lg:sticky lg:top-16 self-start lg:h-fit">
+    <aside className="w-full lg:w-[360px] lg:max-w-[360px] bg-black/40 border border-white/10 rounded-2xl p-6 lg:p-8 shadow-xl backdrop-blur-sm lg:sticky lg:top-16 self-start lg:h-fit cursor-default">
       <div className="flex flex-col items-center text-center gap-4">
         <div className="relative h-40 w-40 rounded-xl overflow-hidden bg-white/5">
           {/* Profil görselini daha sonra /public içine ekleyebilirsin */}
