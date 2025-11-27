@@ -59,6 +59,13 @@ const projects = [
     status: "Bitirme Projesi",
   },
   {
+    title: "Portfolio",
+    description: "Next.js ile geliştirilmiş portfolio uygulaması.",
+    technologies: ["Next.js", "TailwindCSS", "TypeScript"],
+    link: "https://github.com/torcheRR/berkayocer.com-Portfolio",
+    status: "Portfolyo Projesi",
+  },
+  {
     title: "DisneyPlusClone",
     description: "Disney Plus ana sayfa klonu. React.js ile geliştirildi.",
     technologies: ["React.js", "CSS"],
