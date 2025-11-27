@@ -10,13 +10,19 @@ import "swiper/css/pagination";
 import TechBadge from "./TechBadge";
 
 const technologies: { label: string; url: string }[] = [
-  { label: "C#", url: "https://dotnet.microsoft.com/" },
+  { label: "C#", url: "https://dotnet.microsoft.com/languages/csharp" },
   { label: ".NET", url: "https://dotnet.microsoft.com/" },
   { label: "Java", url: "https://www.java.com/" },
   { label: "TypeScript", url: "https://www.typescriptlang.org/" },
-  { label: "ReactJS", url: "https://react.dev/" },
+  { label: "JavaScript", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript" },
+  { label: "React.js", url: "https://react.dev/" },
+  { label: "React Native", url: "https://reactnative.dev/" },
+  { label: "Next.js", url: "https://nextjs.org/" },
+  { label: "TailwindCSS", url: "https://tailwindcss.com/" },
+  { label: "CSS", url: "https://developer.mozilla.org/en-US/docs/Web/CSS" },
   { label: "MySQL", url: "https://www.mysql.com/" },
   { label: "MSSQL", url: "https://www.microsoft.com/sql-server/" },
+  { label: "SQL", url: "https://www.microsoft.com/en-us/sql-server" },
   { label: "Firebase", url: "https://firebase.google.com/" },
   { label: "Supabase", url: "https://supabase.com/" },
 ];
