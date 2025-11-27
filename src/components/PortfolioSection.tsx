@@ -8,6 +8,7 @@ import {
   SiTypescript,
   SiTailwindcss,
   SiSupabase,
+  SiNextdotjs,
 } from "react-icons/si";
 import { FaCode, FaJava, FaDatabase } from "react-icons/fa";
 import { TbBrandCSharp } from "react-icons/tb";
@@ -17,6 +18,7 @@ const getTechIcon = (tech: string) => {
   const iconMap: { [key: string]: React.ReactNode } = {
     "React Native": <SiReact className="w-4 h-4" />,
     "React.js": <SiReact className="w-4 h-4" />,
+    "Next.js": <SiNextdotjs className="w-4 h-4" />,
     Firebase: <SiFirebase className="w-4 h-4" />,
     CSS: <SiCss3 className="w-4 h-4" />,
     Java: <FaJava className="w-4 h-4" />,
@@ -35,6 +37,7 @@ const getTechLink = (tech: string) => {
   const linkMap: { [key: string]: string } = {
     "React Native": "https://reactnative.dev/",
     "React.js": "https://react.dev/",
+    "Next.js": "https://nextjs.org/",
     Firebase: "https://firebase.google.com/",
     CSS: "https://developer.mozilla.org/en-US/docs/Web/CSS",
     Java: "https://www.java.com/",
