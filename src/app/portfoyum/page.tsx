@@ -1,5 +1,13 @@
 import Sidebar from "@/components/Sidebar";
 import PortfolioSection from "@/components/PortfolioSection";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Portföy",
+  description:
+    "Berkay ÖCER'in projeleri: TravelWise, Disney+ klonu, C# ile attribute tabanlı log yapısı ve diğer çalışmalar.",
+  path: "/portfoyum",
+});
 
 export default function PortfolioPage() {
   return (
@@ -7,7 +15,7 @@ export default function PortfolioPage() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      <main className="flex flex-col gap-6 min-w-0">
+      <main id="icerik" tabIndex={-1} className="outline-none flex flex-col gap-6 min-w-0">
         <PortfolioSection />
       </main>
     </div>

@@ -1,4 +1,3 @@
-import SectionCard from "./SectionCard";
 import {
   SiReact,
   SiFirebase,
@@ -49,7 +48,7 @@ const getTechLink = (tech: string) => {
     TailwindCSS: "https://tailwindcss.com/",
     Supabase: "https://supabase.com/",
   };
-  return linkMap[tech] || "#";
+  return linkMap[tech];
 };
 
 const projects = [
@@ -72,7 +71,8 @@ const projects = [
     title: "DisneyPlusClone",
     description: "Disney Plus ana sayfa klonu. React.js ile geliştirildi.",
     technologies: ["React.js", "CSS"],
-    link: "https://github.com/torcheRR/disneyPlusClone",
+    link: "https://github.com/torcheRR/disneyPlusClone_react",
+    demo: "https://disney-plus-clone-bytorcher.vercel.app/",
     status: "Tamamlandı",
   },
   {
@@ -156,19 +156,6 @@ const projects = [
     status: "Aktif",
   },
   {
-    title: "MyReactLearning",
-    description: "React öğrenmek için yaptığım projeler.",
-    technologies: [
-      "React.js",
-      "TypeScript",
-      "TailwindCSS",
-      "CSS",
-      "React Router",
-    ],
-    link: "https://github.com/torcheRR/MyReactLearning",
-    status: "Aktif",
-  },
-  {
     title: "MyHtmlLearning",
     description: "HTML öğrenmek için yaptığım projeler.",
     technologies: ["HTML", "CSS"],
@@ -194,16 +181,16 @@ const projects = [
 export default function PortfolioSection() {
   return (
     <section id="portfoyum" className="space-y-6 cursor-default">
-      <h2 className="text-2xl font-semibold">Portföyüm</h2>
+      <h1 className="text-2xl font-semibold">Portföyüm</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project, index) => (
+        {projects.map((project) => (
           <div
-            key={index}
+            key={project.title}
             className="bg-white/[0.02] border border-white/10 rounded-xl p-6 hover:bg-white/[0.04] transition-colors"
           >
             <div className="flex items-start justify-between mb-3">
-              <h3 className="font-semibold text-lg">{project.title}</h3>
+              <h2 className="font-semibold text-lg">{project.title}</h2>
               <span
                 className={`px-2 py-1 rounded-full text-xs ${
                   project.status === "Tamamlandı"
@@ -222,26 +209,51 @@ export default function PortfolioSection() {
             </p>
 
             <div className="flex flex-wrap gap-2 mb-4">
-              {project.technologies.map((tech, techIndex) => (
+              {project.technologies.map((tech) => {
+                const href = getTechLink(tech);
+                const chipClass =
+                  "flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-white/[0.04] border border-white/10 text-white/60";
+                return href ? (
+                  <a
+                    key={tech}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${chipClass} hover:bg-white/[0.08] hover:text-white/80 transition-colors cursor-pointer`}
+                  >
+                    {getTechIcon(tech)}
+                    {tech}
+                  </a>
+                ) : (
+                  <span key={tech} className={chipClass}>
+                    {getTechIcon(tech)}
+                    {tech}
+                  </span>
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.title} kaynak kodu (GitHub, yeni sekmede açılır)`}
+                className="text-sm text-yellow-400 hover:underline"
+              >
+                Kaynağı Gör →
+              </a>
+              {project.demo && (
                 <a
-                  key={techIndex}
-                  href={getTechLink(tech)}
+                  href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-white/[0.04] border border-white/10 text-white/60 hover:bg-white/[0.08] hover:text-white/80 transition-colors cursor-pointer"
+                  aria-label={`${project.title} canlı demo (yeni sekmede açılır)`}
+                  className="text-sm text-yellow-400 hover:underline"
                 >
-                  {getTechIcon(tech)}
-                  {tech}
+                  Canlı Demo →
                 </a>
-              ))}
+              )}
             </div>
-            <a
-              href={project.link}
-              target="_blank"
-              className="text-sm text-yellow-400 hover:underline"
-            >
-              Kaynağı Gör →
-            </a>
           </div>
         ))}
       </div>

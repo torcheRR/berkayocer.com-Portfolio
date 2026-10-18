@@ -13,7 +13,7 @@ const tabs = [
 export default function TopNav() {
   const pathname = usePathname();
   return (
-    <nav className="sticky top-2 z-40 -mx-2 sm:mx-0 mb-4 sm:mb-6">
+    <nav aria-label="Ana menü" className="sticky top-2 z-40 -mx-2 sm:mx-0 mb-4 sm:mb-6">
       <ul className="flex flex-wrap justify-start gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
         {tabs.map((tab) => {
           const active = pathname === tab.href;
@@ -21,6 +21,7 @@ export default function TopNav() {
             <li key={tab.href}>
               <Link
                 href={tab.href}
+                aria-current={active ? "page" : undefined}
                 className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm whitespace-nowrap border transition-colors ${
                   active
                     ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"

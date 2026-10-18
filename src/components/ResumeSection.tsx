@@ -3,25 +3,25 @@ import SectionCard from "./SectionCard";
 export default function ResumeSection() {
   return (
     <section id="ozgecmisim" className="space-y-6">
-      <h2 className="text-2xl font-semibold">Özgeçmişim</h2>
+      <h1 className="text-2xl font-semibold">Özgeçmişim</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SectionCard
           title="Eğitim"
-          description="Beykent Üniversitesi, Yazılım Mühendisliği (2021–2025), Yeni Mezun — AGNO: 2.82"
+          description="Beykent Üniversitesi, Yazılım Mühendisliği (2021–2025), AGNO: 2.82"
           icon="🎓"
         />
 
         <SectionCard
           title="Özet"
-          description="Yeni mezun Yazılım Mühendisi. Java, C#, React.js, JavaScript ve SQL ile geliştirme deneyimi. Öğrenmeye ve kendini geliştirmeye açık."
+          description="Software Engineer (Yazılım Mühendisi). Java, C#/.NET, React, React Native, TypeScript ve SQL ile web ve mobil uygulama geliştirme deneyimi. Öğrenmeye ve kendini geliştirmeye açık."
           icon="🧩"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4  cursor-default">
         <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4">
-          <h3 className="font-semibold text-lg mb-2">ENKA Power — Stajyer</h3>
+          <h2 className="font-semibold text-lg mb-2">ENKA Power — Stajyer</h2>
           <p className="text-sm text-white/70">
             07.2025 – 08.2025 | Balmumcu/İstanbul
           </p>
@@ -32,9 +32,9 @@ export default function ResumeSection() {
         </div>
 
         <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4">
-          <h3 className="font-semibold text-lg mb-2">
+          <h2 className="font-semibold text-lg mb-2">
             Ziraat Teknoloji — Stajyer
-          </h3>
+          </h2>
           <p className="text-sm text-white/70">
             07.2024 – 08.2024 | Esenler/İstanbul
           </p>
@@ -46,9 +46,9 @@ export default function ResumeSection() {
         </div>
 
         <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4">
-          <h3 className="font-semibold text-lg mb-2">
+          <h2 className="font-semibold text-lg mb-2">
             Realtor Global — Gönüllü Stajyer
-          </h3>
+          </h2>
           <p className="text-sm text-white/70">
             07.2023 – 09.2023 | Kağıthane/İstanbul
           </p>

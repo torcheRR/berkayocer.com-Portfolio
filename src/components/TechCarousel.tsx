@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -27,10 +27,13 @@ const technologies: { label: string; url: string }[] = [
   { label: "Supabase", url: "https://supabase.com/" },
 ];
 
+const arrowClass = "!relative !w-10 !h-10 !mt-0 grid place-items-center rounded-lg hover:cursor-pointer hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-yellow-400";
+
 export default function TechCarousel() {
   const swiperRef = useRef<SwiperType | null>(null);
   const prevRef = useRef<HTMLButtonElement | null>(null);
   const nextRef = useRef<HTMLButtonElement | null>(null);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const swiper = swiperRef.current;
@@ -41,21 +44,11 @@ export default function TechCarousel() {
       const nextEl = nextRef.current;
       if (!prevEl || !nextEl) return;
 
-      if (typeof swiper.params.navigation === "boolean") {
-        swiper.params.navigation = {
-          enabled: true,
-          prevEl,
-          nextEl,
-        };
-      } else if (swiper.params.navigation) {
+      if (typeof swiper.params.navigation === "boolean" || !swiper.params.navigation) {
+        swiper.params.navigation = { enabled: true, prevEl, nextEl };
+      } else {
         swiper.params.navigation.prevEl = prevEl;
         swiper.params.navigation.nextEl = nextEl;
-      } else {
-        swiper.params.navigation = {
-          enabled: true,
-          prevEl,
-          nextEl,
-        };
       }
 
       if (swiper.navigation) {
@@ -65,18 +58,32 @@ export default function TechCarousel() {
       }
     }, 0);
 
+    // Hareketi azaltmayı tercih eden ziyaretçide otomatik kaydırma başlamaz (WCAG 2.2.2).
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      swiper.autoplay?.stop();
+      setPaused(true);
+    }
+
     return () => window.clearTimeout(id);
   }, []);
 
+  const togglePause = () => {
+    const autoplay = swiperRef.current?.autoplay;
+    if (!autoplay) return;
+    if (paused) autoplay.start();
+    else autoplay.stop();
+    setPaused(!paused);
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full" role="region" aria-roledescription="carousel" aria-label="Kullandığım teknolojiler">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={12}
         slidesPerView="auto"
         navigation={false}
         pagination={{ clickable: true }}
-        autoplay={{ delay: 2000, disableOnInteraction: false }}
+        autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
         loop={true}
         className="!pb-12"
         onBeforeInit={(swiper) => {
@@ -85,12 +92,7 @@ export default function TechCarousel() {
       >
         {technologies.map(({ label, url }) => (
           <SwiperSlide key={label} className="!w-auto">
-            <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className="cursor-pointer block"
-            >
+            <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer block">
               <TechBadge label={label} />
             </a>
           </SwiperSlide>
@@ -98,40 +100,31 @@ export default function TechCarousel() {
       </Swiper>
 
       <div className="flex justify-center gap-2 mt-2">
-        <button
-          ref={prevRef}
-          className="!relative !w-10 !h-10 !mt-0 hover:cursor-pointer"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
+        <button ref={prevRef} type="button" aria-label="Önceki teknoloji" className={arrowClass}>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
-          ref={nextRef}
-          className="!relative !w-10 !h-10 !mt-0 hover:cursor-pointer"
+          type="button"
+          onClick={togglePause}
+          aria-pressed={paused}
+          aria-label={paused ? "Otomatik kaydırmayı başlat" : "Otomatik kaydırmayı durdur"}
+          className={arrowClass}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
+          {paused ? (
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+            </svg>
+          )}
+        </button>
+        <button ref={nextRef} type="button" aria-label="Sonraki teknoloji" className={arrowClass}>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
