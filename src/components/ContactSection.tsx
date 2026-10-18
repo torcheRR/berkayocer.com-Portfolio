@@ -1,192 +1,151 @@
 "use client";
 
-import { useState } from "react";
-import { FaGithub, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
 import { MdEmail, MdLocationOn, MdWork } from "react-icons/md";
-import { FaXTwitter, FaInstagram } from "react-icons/fa6";
+import SocialLinks from "./SocialLinks";
+import { site } from "@/lib/site";
+
+const emptyForm = { name: "", email: "", subject: "", message: "" };
+
+const inputClass =
+  "w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-white/50 focus:border-yellow-500/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/40 transition-colors";
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState(emptyForm);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorText, setErrorText] = useState("");
+  // Bot filtresi: formun açık kaldığı süre (tek saatle, istemcide ölçülür) ve görünmez honeypot alanı.
+  const startedAt = useRef(0);
+  const [company, setCompany] = useState("");
 
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  useEffect(() => {
+    startedAt.current = performance.now();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (status === "loading") return;
     setStatus("loading");
+    setErrorText("");
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          company,
+          elapsedMs: Math.round(performance.now() - startedAt.current),
+        }),
       });
+      const data: { ok?: boolean; error?: string } = await res.json().catch(() => ({}));
 
-      if (!res.ok) {
+      if (!res.ok || !data.ok) {
         setStatus("error");
-        alert("Mesaj gönderilirken bir hata oluştu. Lütfen tekrar dene.");
+        setErrorText(data.error || "Mesaj gönderilirken bir hata oluştu. Lütfen tekrar dene.");
         return;
       }
 
       setStatus("success");
-      alert("Mesajın gönderildi, teşekkürler!");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (err) {
-      console.error(err);
+      setFormData(emptyForm);
+    } catch {
       setStatus("error");
-      alert("Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar dene.");
+      setErrorText("Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar dene.");
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
     <section id="iletisim" className="space-y-6">
-      <h2 className="text-2xl font-semibold">İletişim</h2>
+      <h1 className="text-2xl font-semibold">İletişim</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Contact Info */}
         <div className="space-y-6">
           <div className="bg-white/[0.02] border border-white/10 rounded-xl p-6">
-            <h3 className="font-semibold text-lg mb-4">İletişim Bilgileri</h3>
+            <h2 className="font-semibold text-lg mb-4">İletişim Bilgileri</h2>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
-                  <MdEmail className="w-5 h-5 text-blue-400" />
+                  <MdEmail className="w-5 h-5 text-blue-400" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-white/60">E-posta</p>
-                  <a
-                    href="mailto:berkayocer2003@gmail.com"
-                    className="hover:text-blue-400 transition-colors"
-                  >
-                    berkayocer2003@gmail.com
+                  <a href={`mailto:${site.email}`} className="hover:text-blue-400 transition-colors">
+                    {site.email}
                   </a>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-                  <MdLocationOn className="w-5 h-5 text-red-400" />
+                  <MdLocationOn className="w-5 h-5 text-red-400" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-white/60">Konum</p>
-                  <p>İstanbul / Kağıthane</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center justify-center">
-                  <FaPhoneAlt className="w-5 h-5 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-white/60">Telefon</p>
-                  <p>+90 534 484 6406</p>
+                  <p>{site.location}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center">
-                  <MdWork className="w-5 h-5 text-purple-400" />
+                  <MdWork className="w-5 h-5 text-purple-400" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-white/60">Çalışma Durumu</p>
-                  <p>Yeni Mezun - İş Arayışında</p>
+                  <p>Software Engineer (Yazılım Mühendisi)</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="bg-white/[0.02] border border-white/10 rounded-xl p-6">
-            <h3 className="font-semibold text-lg mb-4">Sosyal Medya</h3>
-            <div className="flex gap-4">
-              <a
-                href="https://linkedin.com/in/berkayocer"
-                target="_blank"
-                className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center hover:bg-blue-500/20 transition-colors"
-              >
-                <FaLinkedin className="w-5 h-5 text-blue-400" />
-              </a>
-              <a
-                href="https://github.com/torcheRR"
-                target="_blank"
-                className="w-10 h-10 rounded-lg bg-gray-500/10 border border-gray-500/30 flex items-center justify-center hover:bg-gray-500/20 transition-colors"
-              >
-                <FaGithub className="w-5 h-5 text-gray-400" />
-              </a>
-              <a
-                href="https://x.com/berkayocer_"
-                target="_blank"
-                className="w-10 h-10 rounded-lg bg-black/10 border border-gray-500/30 flex items-center justify-center hover:bg-black/20 transition-colors"
-              >
-                <FaXTwitter className="w-5 h-5 text-white" />
-              </a>
-              <a
-                href="https://www.instagram.com/berkayocer_/"
-                target="_blank"
-                className="w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/30 flex items-center justify-center hover:bg-pink-500/20 transition-colors"
-              >
-                <FaInstagram className="w-5 h-5 text-pink-400" />
-              </a>
-            </div>
+            <h2 className="font-semibold text-lg mb-4">Sosyal Medya</h2>
+            <SocialLinks />
           </div>
         </div>
 
         {/* Contact Form */}
         <div className="bg-white/[0.02] border border-white/10 rounded-xl p-6">
-          <h3 className="font-semibold text-lg mb-4">Mesaj Gönder</h3>
+          <h2 className="font-semibold text-lg mb-4">Mesaj Gönder</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm text-white/70 mb-2"
-                >
+                <label htmlFor="name" className="block text-sm text-white/70 mb-2">
                   Ad Soyad
                 </label>
                 <input
                   type="text"
                   id="name"
                   name="name"
+                  autoComplete="name"
+                  maxLength={100}
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-white/50 focus:border-yellow-500/50 focus:outline-none transition-colors"
+                  className={inputClass}
                   placeholder="Adınız"
                   required
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm text-white/70 mb-2"
-                >
+                <label htmlFor="email" className="block text-sm text-white/70 mb-2">
                   E-posta
                 </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
+                  autoComplete="email"
+                  maxLength={200}
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-white/50 focus:border-yellow-500/50 focus:outline-none transition-colors"
+                  className={inputClass}
                   placeholder="email@example.com"
                   required
                 />
@@ -194,40 +153,51 @@ export default function ContactSection() {
             </div>
 
             <div>
-              <label
-                htmlFor="subject"
-                className="block text-sm text-white/70 mb-2"
-              >
+              <label htmlFor="subject" className="block text-sm text-white/70 mb-2">
                 Konu
               </label>
               <input
                 type="text"
                 id="subject"
                 name="subject"
+                maxLength={150}
                 value={formData.subject}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-white/50 focus:border-yellow-500/50 focus:outline-none transition-colors"
+                className={inputClass}
                 placeholder="Proje teklifi"
                 required
               />
             </div>
 
             <div>
-              <label
-                htmlFor="message"
-                className="block text-sm text-white/70 mb-2"
-              >
+              <label htmlFor="message" className="block text-sm text-white/70 mb-2">
                 Mesaj
               </label>
               <textarea
                 id="message"
                 name="message"
+                minLength={10}
+                maxLength={5000}
                 value={formData.message}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-white/50 focus:border-yellow-500/50 focus:outline-none transition-colors resize-none"
+                className={`${inputClass} resize-none`}
                 placeholder="Mesajınızı buraya yazın..."
                 required
+              />
+            </div>
+
+            {/* Honeypot: ekran okuyuculardan ve klavyeden gizli, botlar doldurur. */}
+            <div className="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+              <label htmlFor="company">Şirket</label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                tabIndex={-1}
+                autoComplete="off"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
               />
             </div>
 
@@ -242,16 +212,14 @@ export default function ContactSection() {
             >
               {status === "loading" ? "Gönderiliyor..." : "Mesaj Gönder"}
             </button>
-            {status === "success" && (
-              <p className="text-xs text-emerald-400 mt-1">
-                Mesajın başarıyla gönderildi.
-              </p>
-            )}
-            {status === "error" && (
-              <p className="text-xs text-red-400 mt-1">
-                Bir hata oluştu, lütfen tekrar dene.
-              </p>
-            )}
+            <p
+              role="status"
+              aria-live="polite"
+              className={`text-xs mt-1 min-h-4 ${status === "error" ? "text-red-400" : "text-emerald-400"}`}
+            >
+              {status === "success" && "Mesajın gönderildi, teşekkürler!"}
+              {status === "error" && errorText}
+            </p>
           </form>
         </div>
       </div>

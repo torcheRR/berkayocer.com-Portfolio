@@ -25,7 +25,6 @@ import {
 import {
   FaCode,
   FaDatabase,
-  FaCloud,
   FaNetworkWired,
   FaAws,
   FaJava,

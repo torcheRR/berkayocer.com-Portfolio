@@ -1,5 +1,13 @@
 import Sidebar from "@/components/Sidebar";
 import ResumeSection from "@/components/ResumeSection";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "Özgeçmiş",
+  description:
+    "Berkay ÖCER'in eğitimi ve staj deneyimleri: Beykent Üniversitesi, ENKA Power, Ziraat Teknoloji ve Realtor Global.",
+  path: "/ozgecmisim",
+});
 
 export default function ResumePage() {
   return (
@@ -7,7 +15,7 @@ export default function ResumePage() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      <main className="flex flex-col gap-6 min-w-0">
+      <main id="icerik" tabIndex={-1} className="outline-none flex flex-col gap-6 min-w-0">
         <ResumeSection />
       </main>
     </div>
