@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // v1 adresleri v2 bilgi mimarisine yönlenir.
+  async redirects() {
+    return [
+      { source: "/portfoyum", destination: "/projeler", permanent: true },
+      { source: "/iletisim", destination: "/#iletisim", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
