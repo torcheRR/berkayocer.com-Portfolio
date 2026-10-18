@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Frame, Row } from "@/components/ui/Frame";
 
 export const metadata: Metadata = {
   title: "Sayfa bulunamadı",
@@ -8,18 +9,17 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main id="icerik" tabIndex={-1} className="outline-none grid place-items-center py-24 text-center">
-      <div className="space-y-4">
-        <p className="text-sm text-white/50">404</p>
-        <h1 className="text-3xl sm:text-4xl font-bold">Sayfa bulunamadı</h1>
-        <p className="text-white/70">Aradığın sayfa taşınmış ya da hiç var olmamış olabilir.</p>
-        <Link
-          href="/"
-          className="inline-block mt-2 px-4 py-2 rounded-lg border bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 transition-colors"
-        >
-          Ana sayfaya dön
-        </Link>
-      </div>
-    </main>
+    <Frame className="mt-16">
+      <main id="icerik" tabIndex={-1} className="outline-none">
+        <Row className="grid justify-items-start gap-4 px-4 py-16 sm:px-7">
+          <span className="font-mono text-xs text-ink-3">Fig. 404</span>
+          <h1 className="font-mono text-[clamp(1.8rem,4.6vw,2.6rem)] leading-none font-medium tracking-[-0.045em]">Sayfa bulunamadı</h1>
+          <p className="text-ink-2">Aradığın sayfa taşınmış ya da hiç var olmamış olabilir.</p>
+          <Link href="/" className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-canvas hover:opacity-90">
+            Ana sayfaya dön
+          </Link>
+        </Row>
+      </main>
+    </Frame>
   );
 }

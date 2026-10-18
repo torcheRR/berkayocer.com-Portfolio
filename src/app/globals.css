@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+/*
+ * berkayocer.com v2 tasarım token'ları.
+ * Tek koyu tema (bilinçli karar). Bilgi bento hücrelerinde, vurgu tek bir sarı "fosforlu kalem".
+ */
+@theme {
+  --color-canvas: #0a0a0b;
+  --color-panel: #0e0f11;
+  --color-panel-2: #131417;
+  --color-line: #1e2024;
+  --color-line-2: #2a2d33;
+  --color-ink: #ececee;
+  --color-ink-2: #a3a6ad;
+  --color-ink-3: #7c808a; /* canvas üzerinde 5:1, panel-2 üzerinde 4.66:1 (WCAG AA) */
+  --color-field: #5c606a; /* form alanı kenarlığı: zemine karşı 3:1 (WCAG 1.4.11) */
+  --color-mark: #facc15;
+  --color-ok: #4ade80;
+  --color-info: #60a5fa;
+  --color-err: #f87171;
+
+  --container-col: 920px;
+  --radius-card: 14px;
 }
 
-/*
- * Site yalnızca koyu temada tasarlandı. Renkler @layer base içinde kalmalı:
- * katmansız bir body kuralı Tailwind utility'lerini ezip açık temalı sistemlerde
- * beyaz zemin + okunmayan metne yol açıyordu.
- */
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
 @layer base {
   html {
     color-scheme: dark;
-    background-color: #0b0b0b;
-    color: #e6e6e6;
-    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
   }
 
-  /* Skip link hedefi sticky menünün altında kalmasın. */
-  #icerik {
-    scroll-margin-top: 6rem;
+  body {
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-mark) 35%, transparent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-mark);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Anchor hedefleri sticky menünün altında kalmasın. */
+  #icerik,
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -30,21 +66,61 @@
   }
 }
 
-/* Hide scrollbar for horizontal overflow */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Çerçeveli sütunun yatay çizgisi: sütunun dışına, ekran kenarına kadar uzanır. */
+@utility row-line {
+  position: relative;
+  border-top: 1px solid var(--color-line);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-line);
+    pointer-events: none;
+  }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+/* Bölümler arası taralı bant. */
+@utility band-hatch {
+  height: 30px;
+  background: repeating-linear-gradient(135deg, transparent 0 7px, var(--color-line) 7px 8px);
 }
 
-/* Swiper pagination bullets - dark theme */
-.swiper-pagination-bullet {
-  background: rgba(255, 255, 255, 0.2) !important;
-  opacity: 1 !important;
+/* Fosforlu kalem vurgusu. */
+@utility marker {
+  position: relative;
+  isolation: isolate;
+  color: var(--color-ink);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: -2px;
+    bottom: 0.08em;
+    height: 0.48em;
+    background: var(--color-mark);
+    opacity: 0.32;
+    border-radius: 2px;
+    z-index: -1;
+  }
 }
-.swiper-pagination-bullet-active {
-  background: #facc15 !important; /* tailwind yellow-400 */
+
+@media print {
+  html {
+    background: #fff;
+    color: #111;
+  }
+
+  .row-line {
+    border-top: 0;
+  }
+
+  .row-line::before,
+  .row-line > [aria-hidden="true"]:first-child,
+  .row-line > [aria-hidden="true"]:nth-child(2) {
+    display: none;
+  }
 }

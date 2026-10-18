@@ -1,32 +1,19 @@
 import type { Metadata } from "next";
 
-export type SocialLink = {
-  label: "LinkedIn" | "GitHub" | "X" | "Instagram";
-  href: string;
-};
-
+// Site düzeyi ayarlar (metadata için senkron erişim gerekir). Kişisel içerik src/content'te.
 export const site = {
-  name: "Berkay ÖCER",
+  name: "Berkay Öcer",
   url: "https://berkayocer.com",
-  title: "Berkay ÖCER | Yazılım Mühendisi",
-  description:
-    "İstanbul'da yaşayan yazılım mühendisi Berkay ÖCER'in portfolyosu: C#/.NET, React, TypeScript ve SQL ile geliştirdiği projeler ve deneyimleri.",
+  title: "Berkay Öcer | Yazılım Mühendisi",
   role: "Yazılım Mühendisi",
-  email: "berkayocer2003@gmail.com",
-  location: "İstanbul, Türkiye",
-  socials: [
-    { label: "LinkedIn", href: "https://linkedin.com/in/berkayocer" },
-    { label: "GitHub", href: "https://github.com/torcheRR" },
-    { label: "X", href: "https://x.com/berkayocer_" },
-    { label: "Instagram", href: "https://www.instagram.com/berkayocer_/" },
-  ] satisfies SocialLink[],
+  description:
+    "İstanbul'da yaşayan yazılım mühendisi Berkay Öcer'in portfolyosu: C#/.NET, React, React Native, TypeScript ve SQL ile geliştirdiği web ve mobil projeler.",
 };
 
 const ogImage = { url: "/opengraph-image", width: 1200, height: 630, alt: `${site.name} · ${site.role}` };
 
-// Sayfa bazlı metadata: openGraph üst seviyede sığ birleştirildiği için ortak alanlar burada tekrar veriliyor.
-// Alt sayfaların openGraph nesnesi kökteki opengraph-image dosyasını ezdiği için görsel açıkça ekleniyor;
-// kök sayfa aynı klasördeki dosyadan (hash'li URL) alıyor.
+// openGraph üst seviyede sığ birleştirildiği için ortak alanlar burada tekrar veriliyor.
+// Sayfa düzeyindeki openGraph nesnesi kökteki opengraph-image dosyasını ezdiği için görsel her sayfaya açıkça ekleniyor.
 export function pageMetadata({
   title,
   description,
@@ -47,7 +34,7 @@ export function pageMetadata({
       url: path,
       title: title ? `${title} | ${site.name}` : site.title,
       description,
-      ...(path !== "/" ? { images: [ogImage] } : {}),
+      images: [ogImage],
     },
   };
 }
