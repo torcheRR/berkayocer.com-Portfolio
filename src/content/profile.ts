@@ -3,6 +3,7 @@ export const profile = {
   role: "Software Engineer",
   tagline: "Yazılım mühendisi. Arayüzü ve arka ucu ==aynı özenle== kuruyorum.",
   bio: "Software Engineer (Yazılım Mühendisi) olarak web ve mobil uygulamalar geliştiriyorum. Java, C#/.NET, React, React Native, TypeScript ve SQL ile çalışıyor; öğrenmeye ve kendimi geliştirmeye devam ediyorum.",
+  portrait: { url: "/IMG_9912.JPG", alt: "Berkay Öcer portresi", width: 1080, height: 1440 },
   location: "İstanbul, Türkiye",
   timeZone: "Europe/Istanbul",
   email: "berkayocer2003@gmail.com",

@@ -1,11 +1,11 @@
 import { ImageResponse } from "next/og";
+import { getProfile } from "@/lib/content";
+import { site } from "@/lib/site";
 
-export const alt = "Berkay Öcer · Yazılım Mühendisi";
+export const alt = `${site.name} · ${site.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const NAME = "Berkay Öcer";
-const ROLE = "Yazılım Mühendisi";
 const META = "BO/26 · berkayocer.com · İstanbul";
 const FIG = "Fig. 1 · Bileşen bileşen, katman katman.";
 
@@ -24,6 +24,16 @@ async function loadGoogleFont(family: string, weight: number, text: string) {
 }
 
 export default async function OpengraphImage() {
+  // Ad ve unvan panelden gelir; 'profile' yayımlanınca görsel de yeniden üretilir.
+  let NAME = site.name;
+  let ROLE = site.role;
+  try {
+    const profile = await getProfile();
+    NAME = profile.name;
+    ROLE = profile.role;
+  } catch {
+    // İçerik alınamazsa site ayarlarıyla devam et.
+  }
   const text = `${NAME}${ROLE}${META}${FIG}`;
   let fonts: { name: string; data: ArrayBuffer; weight: 400 | 500; style: "normal" }[] = [];
   try {

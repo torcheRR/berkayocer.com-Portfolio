@@ -1,20 +1,43 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
+import type { ImageRef } from "@/lib/content/schemas";
 import { cn } from "@/lib/cn";
 
-// Gerçek kapak görseli gelene kadar (Sanity) markanın rengiyle üretilen kapak.
+// Kapak görseli varsa (Sanity) onu, yoksa markanın rengiyle üretilen kapağı gösterir.
 export function ProjectCover({
   mark,
   brand,
+  image,
   label,
   className,
   large,
+  priority,
 }: {
   mark: string;
   brand: string;
+  image?: ImageRef;
   label?: string;
   className?: string;
   large?: boolean;
+  priority?: boolean;
 }) {
+  if (image) {
+    return (
+      <div className={cn("relative overflow-hidden border-b border-line bg-panel", className)}>
+        <Image
+          src={image.url}
+          alt={image.alt}
+          fill
+          sizes={large ? "(min-width: 920px) 920px, 100vw" : "(min-width: 768px) 430px, 100vw"}
+          priority={priority}
+          placeholder={image.lqip ? "blur" : "empty"}
+          blurDataURL={image.lqip}
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       aria-hidden="true"

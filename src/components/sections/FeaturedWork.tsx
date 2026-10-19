@@ -24,7 +24,7 @@ export function FeaturedWork({
           <li key={p.slug} className="min-w-0">
             {/* Link başlıkta; kartın tamamı ::after ile tıklanabilir. Böylece linkin adı yalnızca proje adı olur. */}
             <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-line bg-panel transition-colors hover:border-line-2 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-mark">
-              <ProjectCover mark={p.cover.mark} brand={p.cover.brand} className="aspect-video" />
+              <ProjectCover mark={p.cover.mark} brand={p.cover.brand} image={p.cover.image} className="aspect-video" />
               <div className="grid gap-2 px-[18px] pt-4 pb-[18px]">
                 <div className="flex justify-between gap-2 font-mono text-xs text-ink-3">
                   <span>

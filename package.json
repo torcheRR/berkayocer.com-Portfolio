@@ -9,24 +9,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:sanity": "node --env-file-if-exists=.env.local --import tsx scripts/seed-sanity.ts"
   },
   "dependencies": {
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/orderable-document-list": "^2.0.28",
+    "@sanity/vision": "^6.19.0",
+    "@sanity/webhook": "^4.0.4",
     "next": "^16.4.2",
+    "next-sanity": "^13.3.4",
     "nodemailer": "^10.1.7",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "sanity": "^6.19.0",
     "server-only": "^0.0.1",
+    "styled-components": "^6.6.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@sanity/client": "^8.9.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.2",
+    "lexorank": "^1.0.5",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
