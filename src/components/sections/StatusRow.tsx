@@ -40,7 +40,7 @@ export function StatusRow({ profile }: { profile: Profile }) {
   ];
 
   return (
-    <Row as="section" aria-label="Durum" className="grid grid-cols-2 md:grid-cols-4">
+    <Row as="section" aria-label="Durum" data-hero-status className="grid grid-cols-2 md:grid-cols-4">
       {cells.map((c, i) => (
         <div key={c.key} className={cn("grid min-w-0 content-start gap-1.5 border-line px-[18px] pt-4 pb-[18px]", cellBorders(i))}>
           <span className="flex items-center gap-2 font-mono text-xs text-ink-3">

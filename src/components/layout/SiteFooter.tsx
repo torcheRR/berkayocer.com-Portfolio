@@ -1,5 +1,6 @@
 import { Row } from "@/components/ui/Frame";
 import { LocalTime } from "@/components/ui/LocalTime";
+import { MotionToggle } from "./MotionToggle";
 import { getProfile } from "@/lib/content";
 
 // Vercel build'inde commit hash'i gelir; yerelde "local".
@@ -15,7 +16,8 @@ export async function SiteFooter() {
       <span>
         <LocalTime timeZone={profile.timeZone} prefix="İST " /> · Rev {rev} · © {new Date().getFullYear()} {profile.name}
       </span>
-      <ul className="flex flex-wrap gap-3.5">
+      <ul className="flex flex-wrap items-center gap-3.5">
+        <MotionToggle />
         {profile.socials.map((s) => (
           <li key={s.platform}>
             <a href={s.url} target="_blank" rel="noopener noreferrer" className="hover:text-ink">

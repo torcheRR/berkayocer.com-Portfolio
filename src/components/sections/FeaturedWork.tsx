@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import Link from "next/link";
 import { Row } from "@/components/ui/Frame";
 import { Icon } from "@/components/ui/Icon";
@@ -23,8 +24,15 @@ export function FeaturedWork({
         {projects.map((p, i) => (
           <li key={p.slug} className="min-w-0">
             {/* Link başlıkta; kartın tamamı ::after ile tıklanabilir. Böylece linkin adı yalnızca proje adı olur. */}
-            <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-line bg-panel transition-colors hover:border-line-2 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-mark">
-              <ProjectCover mark={p.cover.mark} brand={p.cover.brand} image={p.cover.image} className="aspect-video" />
+            <article
+              data-reveal
+              data-spotlight
+              className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-line bg-panel transition-colors hover:border-line-2 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-mark"
+            >
+              {/* Proje sayfasındaki kapakla aynı isim: geçişte kapak yerinden büyüyerek açılır. */}
+              <ViewTransition name={`cover-${p.slug}`} share="morph" default="none">
+                <ProjectCover mark={p.cover.mark} brand={p.cover.brand} image={p.cover.image} className="aspect-video" />
+              </ViewTransition>
               <div className="grid gap-2 px-[18px] pt-4 pb-[18px]">
                 <div className="flex justify-between gap-2 font-mono text-xs text-ink-3">
                   <span>

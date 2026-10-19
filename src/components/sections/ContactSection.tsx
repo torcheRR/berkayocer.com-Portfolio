@@ -14,7 +14,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
         <Marker>inşa edelim.</Marker>
       </h2>
 
-      <div className="grid overflow-hidden rounded-card border border-line bg-panel md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <div data-reveal className="grid overflow-hidden rounded-card border border-line bg-panel md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div role="group" aria-label="İletişim bilgileri" className="grid content-start border-b border-line md:border-r md:border-b-0">
           <div className="relative grid min-w-0 gap-1.5 border-b border-line px-[18px] py-4">
             <span className="font-mono text-xs text-ink-3">E-POSTA</span>

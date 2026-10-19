@@ -64,7 +64,14 @@ const stroke = { stroke: "var(--color-line-2)", strokeWidth: 1, vectorEffect: "n
 
 export function IsoArt() {
   return (
-    <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className="absolute inset-0 size-full" aria-hidden="true">
+    <svg
+      viewBox={viewBox}
+      preserveAspectRatio="xMidYMid meet"
+      className="absolute inset-0 size-full"
+      aria-hidden="true"
+      data-iso
+      data-hero-hide
+    >
       <defs>
         <pattern id="iso-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="5" height="5" fill="#0f1013" />
@@ -79,7 +86,8 @@ export function IsoArt() {
         s.tile ? (
           <polygon key={s.key} points={pts(s.tile)} fill="none" stroke="var(--color-line)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
         ) : (
-          <g key={s.key}>
+          // Üst yüzün merkezi: imleçle yükselme hesabı için (hareket katmanı).
+          <g key={s.key} data-block data-cx={s.top[0][0].toFixed(1)} data-cy={s.top[1][1].toFixed(1)}>
             <polygon points={pts(s.left)} fill="#0c0d0f" {...stroke} />
             <polygon points={pts(s.right)} fill="#101114" {...stroke} />
             <polygon

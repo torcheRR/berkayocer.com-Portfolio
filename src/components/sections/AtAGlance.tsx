@@ -57,7 +57,9 @@ export function AtAGlance({
                 { value: stack.length, label: "teknoloji" },
               ].map((s) => (
                 <li key={s.label} className="grid gap-0.5">
-                  <b className="font-mono text-[1.9rem] leading-none font-medium tracking-[-0.04em] tabular-nums">{s.value}</b>
+                  <b data-count className="font-mono text-[1.9rem] leading-none font-medium tracking-[-0.04em] tabular-nums">
+                    {s.value}
+                  </b>
                   <span className="font-mono text-xs text-ink-3">{s.label}</span>
                 </li>
               ))}

@@ -25,6 +25,7 @@ export function ContribCard({ data, user, className }: { data: Contributions; us
       <div
         role="img"
         aria-label={`Son bir yılın GitHub katkı takvimi: ${data.total ?? "bilinmeyen sayıda"} katkı, ${active} aktif gün`}
+        data-contrib
         className="grid grid-flow-col grid-rows-7 justify-start gap-[3px]"
       >
         {cells.map((d, i) => (
