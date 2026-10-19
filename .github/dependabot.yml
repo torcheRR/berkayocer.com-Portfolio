@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint (eslint-config-next) TS 7'yi henüz desteklemiyor; desteklenince kaldırılacak.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # Tipler, Vercel'de çalışan Node sürümüyle (24.x) aynı ana sürümde kalır.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       next-react:
         patterns: ["next", "eslint-config-next", "react", "react-dom", "@types/react*"]
