@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { site } from "@/lib/site";
+
+// Kök layout yalnızca html/body ve fontları kurar. Site stilleri (Tailwind) ve skip link
+// (site)/layout.tsx'te; böylece /studio'daki Sanity Studio site CSS'inden etkilenmez.
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,15 +47,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="tr" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-dvh">
-        <a
-          href="#icerik"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-mark focus:px-4 focus:py-2 focus:font-medium focus:text-canvas"
-        >
-          İçeriğe geç
-        </a>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,12 +1,17 @@
 import "server-only";
 import { cache } from "react";
 import { localSource } from "./adapters/local";
+import { sanitySource } from "./adapters/sanity";
+import { isSanityConfigured } from "@/sanity/env";
 import type { ContentSource } from "./source";
 import type { Project, Technology } from "./schemas";
 
-export type { Education, Experience, Profile, Project, ProjectKind, TechCategory, Technology } from "./schemas";
+export type { Education, Experience, ImageRef, Profile, Project, ProjectKind, TechCategory, Technology } from "./schemas";
 
-const source: ContentSource = localSource;
+// Sanity proje kimliği tanımlıysa içerik Sanity'den gelir. CONTENT_SOURCE=local ile
+// (ör. çevrimdışı geliştirme veya Sanity'den çıkış) yerel seed verisine dönülür.
+export const contentSource = isSanityConfigured && process.env.CONTENT_SOURCE !== "local" ? "sanity" : "local";
+const source: ContentSource = contentSource === "sanity" ? sanitySource : localSource;
 
 export const getProfile = cache(() => source.profile());
 export const getTechnologies = cache(() => source.technologies());

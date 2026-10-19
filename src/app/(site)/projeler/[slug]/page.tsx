@@ -4,16 +4,24 @@ import { notFound } from "next/navigation";
 import { Row } from "@/components/ui/Frame";
 import { Chip } from "@/components/ui/primitives";
 import { ProjectCover } from "@/components/ui/ProjectCover";
+import { CaseStudyBody } from "@/components/sections/CaseStudyBody";
 import { getProject, getProjects, resolveTech } from "@/lib/content";
 import { kindLabel, statusLabel } from "@/lib/content/labels";
 import { pageMetadata } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
+// Build'de bilinen projeler önceden üretilir; panelden sonradan eklenenler ilk ziyarette üretilip önbelleğe alınır.
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return (await getProjects()).map((p) => ({ slug: p.slug }));
+  // İçerik kaynağına build sırasında ulaşılamazsa sayfalar ilk ziyarette üretilir (dynamicParams).
+  try {
+    return (await getProjects()).map((p) => ({ slug: p.slug }));
+  } catch (error) {
+    console.error("generateStaticParams: projeler alınamadı", error instanceof Error ? error.message : error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -42,7 +50,14 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <article>
       <Row>
-        <ProjectCover mark={project.cover.mark} brand={project.cover.brand} className="aspect-[21/9] sm:aspect-[21/8]" large />
+        <ProjectCover
+          mark={project.cover.mark}
+          brand={project.cover.brand}
+          image={project.cover.wideImage ?? project.cover.image}
+          className="aspect-[21/9] sm:aspect-[21/8]"
+          large
+          priority
+        />
       </Row>
       <Row className="grid gap-5 px-4 py-6 sm:px-7 sm:py-8">
         <nav aria-label="Sayfa konumu" className="font-mono text-xs text-ink-3">
@@ -93,6 +108,11 @@ export default async function ProjectPage({ params }: Props) {
           ) : null}
         </div>
       </Row>
+      {project.body.length ? (
+        <Row as="section" aria-label="Case study" className="px-4 py-6 sm:px-7 sm:py-8">
+          <CaseStudyBody body={project.body} />
+        </Row>
+      ) : null}
       {next && next.slug !== project.slug ? (
         <Row className="flex items-center justify-between gap-4 px-4 py-5 font-mono text-xs text-ink-3 sm:px-7">
           <span>Sıradaki proje</span>

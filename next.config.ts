@@ -14,6 +14,17 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Sanity görselleri CDN'den kırpılmış ve boyutlandırılmış gelir. Optimizer yalnızca bu projenin
+  // dataset'ine açık; başka Sanity projelerinin görselleri üzerinden kotanın tüketilmesi önlenir.
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "unset"}/${process.env.NEXT_PUBLIC_SANITY_DATASET || "production"}/**`,
+      },
+    ],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

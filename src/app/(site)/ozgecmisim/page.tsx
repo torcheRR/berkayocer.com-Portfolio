@@ -2,6 +2,7 @@ import { Row } from "@/components/ui/Frame";
 import { PrintButton } from "@/components/ui/PrintButton";
 import { getEducation, getExperience, getFeaturedProjects, getProfile, getTechnologies } from "@/lib/content";
 import { categoryLabel, formatPeriod, kindLabel, techCategoryOrder } from "@/lib/content/labels";
+import type { TechCategory } from "@/lib/content";
 import { pageMetadata } from "@/lib/site";
 
 export const metadata = pageMetadata({
@@ -21,9 +22,11 @@ export default async function ResumePage() {
     getFeaturedProjects(),
   ]);
 
-  // Her teknoloji birincil kategorisinde bir kez listelenir.
+  // Her teknoloji, seçili kategorilerinden sıralamada en önde olanın altında bir kez listelenir
+  // (Studio kategorileri kendi sırasıyla sakladığı için categories[0]'a güvenilmez).
+  const primary = (cats: TechCategory[]) => techCategoryOrder.find((c) => cats.includes(c));
   const groups = techCategoryOrder
-    .map((c) => ({ category: c, items: techs.filter((t) => t.inStack && t.categories[0] === c).map((t) => t.name) }))
+    .map((c) => ({ category: c, items: techs.filter((t) => t.inStack && primary(t.categories) === c).map((t) => t.name) }))
     .filter((g) => g.items.length);
 
   return (
