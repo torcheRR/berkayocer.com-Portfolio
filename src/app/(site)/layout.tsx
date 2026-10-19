@@ -1,10 +1,16 @@
 import "../globals.css";
+import "lenis/dist/lenis.css";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { CommandPalette } from "@/components/layout/CommandPalette";
+import { GridOverlay } from "@/components/layout/GridOverlay";
+import { Motion } from "@/components/motion/Motion";
 import { Frame } from "@/components/ui/Frame";
+import { getProfile } from "@/lib/content";
 
-// Tüm site sayfalarının tek kabuğu: skip link, üst menü, çerçeveli sütun, footer.
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+// Tüm site sayfalarının tek kabuğu: skip link, üst menü, çerçeveli sütun, footer, hareket katmanı.
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const profile = await getProfile();
   return (
     <div className="min-h-dvh">
       <a
@@ -20,6 +26,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         </main>
         <SiteFooter />
       </Frame>
+      <CommandPalette email={profile.email} socials={profile.socials.map(({ label, url }) => ({ label, url }))} />
+      <GridOverlay />
+      <Motion />
     </div>
   );
 }

@@ -86,16 +86,21 @@ export function Hero({ profile, education }: { profile: Profile; education?: Edu
           />
         </div>
         <div>
-          <h1 id="hero-name" className="font-mono text-[clamp(2.1rem,5.4vw,3.7rem)] leading-none font-medium tracking-[-0.05em]">
+          <h1
+            id="hero-name"
+            data-hero-name
+            data-hero-hide
+            className="font-mono text-[clamp(2.1rem,5.4vw,3.7rem)] leading-none font-medium tracking-[-0.05em]"
+          >
             {profile.name}
           </h1>
-          <p className="mt-2.5 max-w-[52ch] text-[15.5px] text-ink-2">
+          <p data-hero-tagline className="mt-2.5 max-w-[52ch] text-[15.5px] text-ink-2">
             <RichInline text={profile.tagline} />
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2">
+      <div data-hero-facts className="grid grid-cols-1 sm:grid-cols-2">
         {facts.map((f, i) => (
           <Fact
             key={f.key}

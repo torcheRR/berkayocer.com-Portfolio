@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -50,14 +51,16 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <article>
       <Row>
-        <ProjectCover
-          mark={project.cover.mark}
-          brand={project.cover.brand}
-          image={project.cover.wideImage ?? project.cover.image}
-          className="aspect-[21/9] sm:aspect-[21/8]"
-          large
-          priority
-        />
+        <ViewTransition name={`cover-${project.slug}`} share="morph" default="none">
+          <ProjectCover
+            mark={project.cover.mark}
+            brand={project.cover.brand}
+            image={project.cover.wideImage ?? project.cover.image}
+            className="aspect-[21/9] sm:aspect-[21/8]"
+            large
+            priority
+          />
+        </ViewTransition>
       </Row>
       <Row className="grid gap-5 px-4 py-6 sm:px-7 sm:py-8">
         <nav aria-label="Sayfa konumu" className="font-mono text-xs text-ink-3">

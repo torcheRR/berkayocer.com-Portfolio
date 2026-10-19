@@ -167,7 +167,8 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="grid size-[116px] shrink-0 place-items-center rounded-full bg-mark text-center text-[13px] leading-tight font-semibold text-[#15130a] transition-transform hover:scale-[1.03] disabled:cursor-wait disabled:opacity-75"
+          data-magnetic
+          className="grid size-[116px] shrink-0 place-items-center rounded-full bg-mark text-center text-[13px] leading-tight font-semibold text-[#15130a] disabled:cursor-wait disabled:opacity-75"
         >
           {status === "loading" ? "Gönderiliyor…" : (
             <span>

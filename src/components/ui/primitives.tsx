@@ -22,14 +22,18 @@ export function SectionHead({
         {title}
         {count ? <sup className="ml-1 align-top font-mono text-xs font-normal tracking-normal text-ink-3">{count}</sup> : null}
       </Heading>
-      <span aria-hidden="true" className="h-px flex-1 self-center bg-line-2" />
+      <span aria-hidden="true" data-rule className="h-px flex-1 origin-left self-center bg-line-2" />
     </div>
   );
 }
 
 export function Card({ as: Tag = "article", className, children }: { as?: ElementType; className?: string; children: ReactNode }) {
   return (
-    <Tag className={cn("relative flex min-w-0 flex-col gap-3 overflow-hidden rounded-card border border-line bg-panel p-[18px]", className)}>
+    <Tag
+      data-reveal
+      data-spotlight
+      className={cn("relative flex min-w-0 flex-col gap-3 overflow-hidden rounded-card border border-line bg-panel p-[18px]", className)}
+    >
       {children}
     </Tag>
   );

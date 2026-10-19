@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { site } from "@/lib/site";
+import { motionInitScript } from "@/lib/motion/init";
 
 // Kök layout yalnızca html/body ve fontları kurar. Site stilleri (Tailwind) ve skip link
 // (site)/layout.tsx'te; böylece /studio'daki Sanity Studio site CSS'inden etkilenmez.
@@ -46,7 +47,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="tr" className={`${geistSans.variable} ${geistMono.variable}`}>
+    // data-motion, boyamadan önce satır içi script ile eklenir; hidrasyon uyarısı bilinçli olarak bastırılır.
+    // data-scroll-behavior: Next 16 sayfa geçişlerinde CSS'teki smooth scroll'u yalnızca bu işaret varsa kapatır;
+    // yoksa yeni sayfa en üste atlamak yerine aşağıdan kayarak açılır.
+    <html
+      lang="tr"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: motionInitScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

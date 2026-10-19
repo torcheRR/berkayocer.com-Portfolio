@@ -26,8 +26,9 @@ export function ExperienceLog({ experience, education }: { experience: Experienc
   return (
     <Row as="section" id="deneyim" aria-labelledby="h-deneyim">
       <SectionHead fig="Fig. 05" title="Deneyim" count="(log)" id="h-deneyim" />
-      <ol className="relative px-4 pb-6 sm:px-7 sm:pb-7">
-        <span aria-hidden="true" className="absolute top-1.5 bottom-9 left-[27px] w-px bg-mark/70 sm:left-[39px]" />
+      {/* Hareket açıkken çizgi scroll ile dolar, noktalar sırayla yanar; dinlenme halinde ilk nokta yanık. */}
+      <ol data-log className="relative px-4 pb-6 sm:px-7 sm:pb-7">
+        <span aria-hidden="true" data-log-line className="absolute top-1.5 bottom-9 left-[27px] w-px origin-top bg-mark/70 sm:left-[39px]" />
         {entries.map((e, i) => (
           <li
             key={e.key}
@@ -35,10 +36,9 @@ export function ExperienceLog({ experience, education }: { experience: Experienc
           >
             <span
               aria-hidden="true"
-              className={
-                "relative z-[1] mt-1.5 ml-[7px] size-[9px] rounded-full border " +
-                (i === 0 ? "border-mark bg-mark" : "border-ink-3 bg-canvas")
-              }
+              data-log-dot
+              data-on={i === 0 ? "true" : "false"}
+              className="relative z-[1] mt-1.5 ml-[7px] size-[9px] rounded-full border border-ink-3 bg-canvas transition-colors duration-300 data-[on=true]:border-mark data-[on=true]:bg-mark"
             />
             <span className="font-mono text-xs text-ink-3 max-sm:col-start-2">{e.period}</span>
             <div className="max-sm:col-start-2">

@@ -105,7 +105,118 @@
     opacity: 0.32;
     border-radius: 2px;
     z-index: -1;
+    /* Hareket katmanı --marker'ı 0'dan 1'e çizer; dinlenme hali tam çizili. */
+    transform: scaleX(var(--marker, 1));
+    transform-origin: left center;
   }
+}
+
+/* ---------- Hareket katmanı ---------- */
+
+/* Lenis açıkken yumuşatmayı o yapar; tarayıcının kendi smooth scroll'u ikinci bir yumuşatma eklemesin. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+/* Hareket azaltılmışsa tarayıcının yumuşak kaydırması da kapanır. */
+html[data-motion="reduced"] {
+  scroll-behavior: auto;
+}
+
+/*
+ * Hero açılışı (yalnızca fareli cihazlarda). JS animasyonu başlatana kadar isim ve bloklar gizli,
+ * metinler görünür ama 8px aşağıda bekler (LCP gecikmez). Parça gecikirse 0.8 sn sonra CSS her şeyi
+ * yerine koyar; JS bu süreden sonra gelirse açılışı oynatmaz. Mobilde hiçbir şey bekletilmez.
+ * Seçiciler MotionRuntime.tsx'teki HERO_RISE ile aynı.
+ */
+@media (hover: hover) and (pointer: fine) {
+  html[data-motion="full"] [data-hero-hide] {
+    visibility: hidden;
+  }
+
+  html[data-motion="full"] :is([data-hero-tagline], [data-hero-facts] > *, [data-hero-status] > :not([aria-hidden])) {
+    translate: 0 8px;
+  }
+
+  html[data-motion="full"] [data-hero-tagline] .marker {
+    --marker: 0;
+  }
+
+  html[data-motion="full"]
+    :is([data-hero-hide], [data-hero-tagline], [data-hero-tagline] .marker, [data-hero-facts] > *, [data-hero-status] > :not([aria-hidden])) {
+    animation: hero-fallback 0s linear 0.8s forwards;
+  }
+}
+
+@keyframes hero-fallback {
+  to {
+    visibility: visible;
+    translate: none;
+    --marker: 1;
+  }
+}
+
+/* Kartlarda imleci izleyen hafif sarı ışık (yalnızca fareli cihazlarda). */
+[data-spotlight]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--color-mark) 7%, transparent), transparent 60%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-motion="full"] [data-spotlight]:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Karttan proje sayfasına geçiş (React <ViewTransition>). */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+:root[data-motion="reduced"]::view-transition-old(*),
+:root[data-motion="reduced"]::view-transition-new(*),
+:root[data-motion="reduced"]::view-transition-group(*) {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  transition-duration: 0s !important;
 }
 
 @media print {
@@ -122,5 +233,18 @@
   .row-line > [aria-hidden="true"]:first-child,
   .row-line > [aria-hidden="true"]:nth-child(2) {
     display: none;
+  }
+
+  /* Kaydırılmadan yazdırılırsa henüz belirmemiş öğeler de basılır. */
+  :is([data-reveal], [data-rule], [data-contrib] > *, [data-hero-hide], [data-iso] [data-block]),
+  :is([data-hero-tagline], [data-hero-facts] > *, [data-hero-status] > *) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    translate: none !important;
+  }
+
+  .marker::before {
+    transform: none !important;
   }
 }
