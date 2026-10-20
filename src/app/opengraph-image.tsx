@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getPublishedProfile } from "@/lib/content";
 import { site } from "@/lib/site";
+import { loadGoogleFont } from "@/lib/og/google-font";
 
 export const alt = `${site.name} · ${site.role}`;
 export const size = { width: 1200, height: 630 };
@@ -8,20 +9,6 @@ export const contentType = "image/png";
 
 const META = "BO/26 · berkayocer.com · İstanbul";
 const FIG = "Fig. 1 · Bileşen bileşen, katman katman.";
-
-// Satori woff2 okuyamıyor; tarayıcı user-agent'ı olmadan Google Fonts TTF döndürür.
-// Türkçe karakterler (ı, ş, ğ, İ) için Geist Mono yükleniyor.
-async function loadGoogleFont(family: string, weight: number, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${family}:wght@${weight}&text=${encodeURIComponent(text)}`;
-  const cssRes = await fetch(url, { signal: AbortSignal.timeout(5000) });
-  if (!cssRes.ok) throw new Error("Font CSS'i alınamadı");
-  const css = await cssRes.text();
-  const resource = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/);
-  if (!resource) throw new Error("Font kaynağı bulunamadı");
-  const res = await fetch(resource[1], { signal: AbortSignal.timeout(5000) });
-  if (!res.ok) throw new Error("Font indirilemedi");
-  return res.arrayBuffer();
-}
 
 export default async function OpengraphImage() {
   // Ad ve unvan panelden gelir; 'profile' yayımlanınca görsel de yeniden üretilir. Taslak hiçbir zaman kullanılmaz.
