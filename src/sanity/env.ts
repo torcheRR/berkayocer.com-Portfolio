@@ -5,3 +5,6 @@ export const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? "2026-10
 
 // Proje kimliği tanımlı değilse site yerel seed içeriğiyle çalışmaya devam eder.
 export const isSanityConfigured = /^[a-z0-9-]+$/.test(projectId);
+
+// Gömülü Studio'nun yolu: sanity.config basePath'i, stega bağlantıları ve önizleme linkleri aynı değeri kullanır.
+export const studioUrl = "/studio";

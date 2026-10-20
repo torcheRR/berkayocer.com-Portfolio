@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getProfile } from "@/lib/content";
+import { getPublishedProfile } from "@/lib/content";
 import { site } from "@/lib/site";
 
 export const alt = `${site.name} · ${site.role}`;
@@ -24,11 +24,11 @@ async function loadGoogleFont(family: string, weight: number, text: string) {
 }
 
 export default async function OpengraphImage() {
-  // Ad ve unvan panelden gelir; 'profile' yayımlanınca görsel de yeniden üretilir.
+  // Ad ve unvan panelden gelir; 'profile' yayımlanınca görsel de yeniden üretilir. Taslak hiçbir zaman kullanılmaz.
   let NAME = site.name;
   let ROLE = site.role;
   try {
-    const profile = await getProfile();
+    const profile = await getPublishedProfile();
     NAME = profile.name;
     ROLE = profile.role;
   } catch {

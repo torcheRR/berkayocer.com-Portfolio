@@ -5,14 +5,15 @@ import { AtAGlance } from "@/components/sections/AtAGlance";
 import { FeaturedWork } from "@/components/sections/FeaturedWork";
 import { ExperienceLog } from "@/components/sections/ExperienceLog";
 import { ContactSection } from "@/components/sections/ContactSection";
-import { getEducation, getExperience, getFeaturedProjects, getProfile, getProjects, getTechMap, getTechnologies } from "@/lib/content";
+import { stegaClean } from "next-sanity";
+import { getEducation, getExperience, getFeaturedProjects, getProfile, getProjects, getTechMap, getTechnologies, isPreview } from "@/lib/content";
 import { getContributions } from "@/lib/github";
 import { pageMetadata, site } from "@/lib/site";
 
 export const metadata = pageMetadata({ description: site.description, path: "/" });
 
 export default async function HomePage() {
-  const [profile, techs, techMap, featured, all, experience, education] = await Promise.all([
+  const [profile, techs, techMap, featured, all, experience, education, preview] = await Promise.all([
     getProfile(),
     getTechnologies(),
     getTechMap(),
@@ -20,8 +21,9 @@ export default async function HomePage() {
     getProjects(),
     getExperience(),
     getEducation(),
+    isPreview(),
   ]);
-  const contributions = profile.showGithubActivity ? await getContributions(profile.githubUser) : null;
+  const contributions = profile.showGithubActivity ? await getContributions(profile.githubUser, { preview }) : null;
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -38,7 +40,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c") }} />
+      {/* Önizlemede ad, unvan ve okul adları görünmez işaret taşır; yapılandırılmış veri temiz kalmalı. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(stegaClean(personJsonLd)).replace(/</g, "\\u003c") }} />
       <Hero profile={profile} education={education[0]} />
       <StatusRow profile={profile} />
       <Band />
@@ -46,7 +49,7 @@ export default async function HomePage() {
       <FeaturedWork projects={featured} techMap={techMap} total={all.length} />
       <ExperienceLog experience={experience} education={education} />
       <Band />
-      <ContactSection profile={profile} />
+      <ContactSection profile={profile} preview={preview} />
     </>
   );
 }

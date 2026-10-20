@@ -8,7 +8,10 @@ import { syncMotionAttribute, useMotionEnabled } from "@/lib/motion/preference";
 const loadRuntime = () => import("./MotionRuntime");
 
 // Hareket açıksa parça, hidrasyonu beklemeden bu modül değerlendirilirken istenir (şelale olmaz).
-if (typeof document !== "undefined" && document.documentElement.dataset.motion === "full") void loadRuntime();
+// Önizleme kilidi (data-preview) varsa hiç istenmez.
+if (typeof document !== "undefined" && document.documentElement.dataset.motion === "full" && !document.documentElement.hasAttribute("data-preview")) {
+  void loadRuntime();
+}
 
 const MotionRuntime = dynamic(loadRuntime, { ssr: false });
 

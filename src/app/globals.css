@@ -248,3 +248,13 @@ html[data-motion="reduced"] *::after {
     transform: none !important;
   }
 }
+
+/* Önizleme: kartı kaplayan link katmanı, alttaki alanların tıkla-düzenle katmanlarını yutmasın. */
+html[data-preview] [data-card-link]::after {
+  pointer-events: none;
+}
+
+/* Önizleme şeridi altta sabit: klavye odağı şeridin altında kalmasın. */
+html[data-preview] {
+  scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+}

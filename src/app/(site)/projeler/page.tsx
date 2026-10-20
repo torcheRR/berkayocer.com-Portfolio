@@ -1,3 +1,4 @@
+import { stegaClean } from "next-sanity";
 import { Row } from "@/components/ui/Frame";
 import { SectionHead } from "@/components/ui/primitives";
 import { ProjectArchive } from "@/components/sections/ProjectArchive";
@@ -15,6 +16,7 @@ export default async function ProjectsPage() {
   const items = projects.map((p) => ({
     slug: p.slug,
     title: p.title,
+    label: stegaClean(p.title),
     summary: p.summary,
     year: p.year,
     kind: p.kind,

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { stegaClean } from "next-sanity";
 import type { ReactNode } from "react";
 import { Row } from "@/components/ui/Frame";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -95,7 +96,10 @@ export function Hero({ profile, education }: { profile: Profile; education?: Edu
             {profile.name}
           </h1>
           <p data-hero-tagline className="mt-2.5 max-w-[52ch] text-[15.5px] text-ink-2">
-            <RichInline text={profile.tagline} />
+            {/* Önizlemede tıkla-düzenle işareti metnin sonuna eklenir; işaretleme ayrıştırılmadan önce ayrılıp
+                paragrafın doğrudan altına konur ki düzenleme katmanı bütün sloganı kapsasın. Ziyaretçide ek boştur. */}
+            <RichInline text={stegaClean(profile.tagline)} />
+            {profile.tagline.slice(stegaClean(profile.tagline).length)}
           </p>
         </div>
       </div>

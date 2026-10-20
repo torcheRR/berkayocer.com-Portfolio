@@ -23,14 +23,17 @@ function validate(values: Record<Field, string>): Field[] {
   return bad;
 }
 
+const PREVIEW_NOTE = "Önizlemede form gönderimi kapalı.";
+
 const inputClass =
   "w-full rounded-[10px] border border-field bg-canvas px-3 py-2.5 text-sm text-ink outline-none transition-[border-color,box-shadow] placeholder:text-ink-3 focus:border-mark/60 focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-mark)_14%,transparent)]";
 
-export function ContactForm() {
+// disabled: önizleme modunda form doldurulabilir ama gönderilmez (sunucu da 403 döner).
+export function ContactForm({ disabled = false }: { disabled?: boolean }) {
   const [values, setValues] = useState(empty);
   const [invalid, setInvalid] = useState<Field[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(disabled ? PREVIEW_NOTE : "");
   const [company, setCompany] = useState("");
   // Bot filtresi: formun açık kaldığı süre tek saatle, istemcide ölçülür.
   const startedAt = useRef(0);
@@ -49,7 +52,7 @@ export function ContactForm() {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (status === "loading") return;
+    if (disabled || status === "loading") return;
     const bad = validate(values);
     setInvalid(bad);
     if (bad.length) {
@@ -166,9 +169,12 @@ export function ContactForm() {
         </p>
         <button
           type="submit"
-          disabled={status === "loading"}
+          disabled={disabled || status === "loading"}
           data-magnetic
-          className="grid size-[116px] shrink-0 place-items-center rounded-full bg-mark text-center text-[13px] leading-tight font-semibold text-[#15130a] disabled:cursor-wait disabled:opacity-75"
+          className={cn(
+            "grid size-[116px] shrink-0 place-items-center rounded-full bg-mark text-center text-[13px] leading-tight font-semibold text-[#15130a] disabled:opacity-75",
+            disabled ? "disabled:cursor-not-allowed" : "disabled:cursor-wait",
+          )}
         >
           {status === "loading" ? "Gönderiliyor…" : (
             <span>

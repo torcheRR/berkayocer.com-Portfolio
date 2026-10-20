@@ -1,4 +1,4 @@
-import { ViewTransition } from "react";
+import { Fragment, ViewTransition } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,7 +6,7 @@ import { Row } from "@/components/ui/Frame";
 import { Chip } from "@/components/ui/primitives";
 import { ProjectCover } from "@/components/ui/ProjectCover";
 import { CaseStudyBody } from "@/components/sections/CaseStudyBody";
-import { getProject, getProjects, resolveTech } from "@/lib/content";
+import { getProject, getProjects, getPublishedProjects, resolveTech } from "@/lib/content";
 import { kindLabel, statusLabel } from "@/lib/content/labels";
 import { pageMetadata } from "@/lib/site";
 
@@ -17,8 +17,9 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   // İçerik kaynağına build sırasında ulaşılamazsa sayfalar ilk ziyarette üretilir (dynamicParams).
+  // Build'de draft mode yoktur: yalnızca yayımlanmış projeler (taslak getter'ı burada hata verirdi).
   try {
-    return (await getProjects()).map((p) => ({ slug: p.slug }));
+    return (await getPublishedProjects()).map((p) => ({ slug: p.slug }));
   } catch (error) {
     console.error("generateStaticParams: projeler alınamadı", error instanceof Error ? error.message : error);
     return [];
@@ -45,7 +46,16 @@ export default async function ProjectPage({ params }: Props) {
     { label: "Tür", value: kindLabel[project.kind] },
     { label: "Yıl", value: String(project.year) },
     { label: "Durum", value: statusLabel[project.status] },
-    { label: "Stack", value: tech.map((t) => t.name).join(" · ") },
+    {
+      label: "Stack",
+      // Her ad ayrı düğüm: önizlemede her teknoloji kendi belgesini açar.
+      value: tech.map((t, i) => (
+        <Fragment key={t.slug}>
+          {i ? " · " : null}
+          <span>{t.name}</span>
+        </Fragment>
+      )),
+    },
   ];
 
   return (

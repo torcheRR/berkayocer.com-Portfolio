@@ -10,6 +10,9 @@ const securityHeaders = [
   // Sanity Studio önizlemesi aynı origin'den iframe kullanacağı için 'none' yerine 'self'.
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+  // Başka bir sitenin açtığı pencereyle bağ kopar: önizlemedeki düzenleme kanalına (postMessage) dışarıdan ulaşılamaz.
+  // allow-popups: Studio'nun kendi açtığı önizleme penceresi çalışmaya devam eder. Site ve /studio'da aynı değer.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
 ];
 
 const nextConfig: NextConfig = {

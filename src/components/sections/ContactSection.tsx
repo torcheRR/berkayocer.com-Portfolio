@@ -4,7 +4,8 @@ import { Marker, StatusSquare } from "@/components/ui/primitives";
 import type { Profile } from "@/lib/content";
 import { ContactForm } from "./ContactForm";
 
-export function ContactSection({ profile }: { profile: Profile }) {
+// preview: site sahibi önizlemedeyken form gönderimi kapalıdır (taslak içerikle gerçek e-posta gitmesin).
+export function ContactSection({ profile, preview = false }: { profile: Profile; preview?: boolean }) {
   return (
     <Row as="section" id="iletisim" aria-labelledby="h-cta" className="grid gap-7 px-4 pt-10 pb-8 sm:px-7 sm:pt-14 sm:pb-10">
       <span className="font-mono text-xs text-ink-3">Fig. 06 · İletişim</span>
@@ -52,7 +53,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
             </ul>
           </div>
         </div>
-        <ContactForm />
+        <ContactForm disabled={preview} />
       </div>
     </Row>
   );

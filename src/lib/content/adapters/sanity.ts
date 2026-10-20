@@ -1,9 +1,10 @@
 import "server-only";
 import { z } from "zod";
-import { defineQuery } from "next-sanity";
+import { defineQuery, stegaClean } from "next-sanity";
 import { sanityFetch, urlFor } from "@/sanity/client";
+import { reportIssue, type IssueType } from "../issues";
 import { Education, Experience, Profile, Project, Technology, type ImageRef } from "../schemas";
-import type { ContentSource } from "../source";
+import type { ContentSource, ReadMode } from "../source";
 
 // Sanity'deki çok dilli alanlardan bugün yalnızca Türkçe okunur.
 type L10n = { tr?: string; en?: string } | null | undefined;
@@ -53,56 +54,112 @@ const projectsQuery = defineQuery(`*[_type == "project" && defined(slug.current)
 const experienceQuery = defineQuery(`*[_type == "experience"] | order(start desc)`);
 const educationQuery = defineQuery(`*[_type == "education"] | order(start desc)`);
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- GROQ sonuçları burada Zod ile doğrulanıyor */
+
+// Önizleme panelindeki kayıt için belgenin okunur adı ve hatalı alanın Studio'daki adı.
+const LABEL_FIELD: Record<IssueType, string> = { profile: "name", project: "title", technology: "name", experience: "company", education: "school" };
+// Adapter'da üretilen, şemada karşılığı olmayan alanlar: tıkla-düzenle bunlar yerine belgenin ad alanına gider.
+const DERIVED = new Set(["id", "order"]);
+
+function issueField(type: IssueType, error: z.ZodError) {
+  const top = error.issues[0]?.path[0];
+  return typeof top === "string" && !DERIVED.has(top) ? top : LABEL_FIELD[type];
+}
+
 // Hatalı tek bir kaydın tüm siteyi düşürmemesi için liste öğeleri tek tek doğrulanır; geçersizler loglanıp atlanır.
-function parseList<T extends z.ZodType>(schema: T, items: unknown[], label: string): z.infer<T>[] {
+// Önizlemede atlanan taslak, panelde tıklanabilir bir kayıt olarak gösterilir (docs ile items aynı sırada).
+function parseList<T extends z.ZodType>(schema: T, items: unknown[], type: IssueType, mode: ReadMode, docs: any[]): z.infer<T>[] {
   return items.flatMap((item, i) => {
     const r = schema.safeParse(item);
     if (r.success) return [r.data];
-    console.error(`[sanity] ${label}[${i}] atlandı:\n${z.prettifyError(r.error)}`);
+    console.error(`[sanity] ${type}[${i}] atlandı:\n${z.prettifyError(r.error)}`);
+    if (mode.preview) {
+      const d = docs[i] ?? {};
+      reportIssue({
+        type,
+        id: String(d._id),
+        title: stegaClean(String(d.title ?? d.name ?? d.company ?? d.school ?? d._id)),
+        field: issueField(type, r.error),
+        message: stegaClean(z.prettifyError(r.error)),
+      });
+    }
     return [];
   });
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- GROQ sonuçları burada Zod ile doğrulanıyor */
+// Profil doğrulama hatası; tıkla-düzenle için hatalı alanın adını taşır.
+class ProfileError extends Error {
+  readonly field: string;
+  constructor(message: string, field: string) {
+    super(message);
+    this.field = field;
+  }
+}
+
+async function loadProfile(mode: ReadMode) {
+  const p = await sanityFetch<any>(profileQuery, ["profile"], mode);
+  if (!p) {
+    throw new Error(
+      "Sanity: 'profile' belgesi bulunamadı. Önce `npm run seed:sanity` ile içeriği taşı ya da yerelde /studio'dan Profil'i doldurup yayımla.",
+    );
+  }
+  const result = Profile.safeParse({
+    name: p.name,
+    role: p.role,
+    tagline: tr(p.tagline),
+    bio: tr(p.bio),
+    portrait: image(p.portrait, 600, 600),
+    location: tr(p.location),
+    timeZone: p.timeZone,
+    email: p.email,
+    githubUser: p.githubUser,
+    showGithubActivity: p.showGithubActivity ?? true,
+    availability: tr(p.availability),
+    socials: p.socials ?? [],
+    status: (p.status ?? []).map((s: any) => ({ label: tr(s.label), title: tr(s.title), detail: tr(s.detail), tone: s.tone })),
+    workflow: { text: tr(p.workflow?.text), steps: p.workflow?.steps ?? [] },
+  });
+  if (!result.success) {
+    throw new ProfileError(`Sanity profil doğrulama hatası:\n${z.prettifyError(result.error)}`, issueField("profile", result.error));
+  }
+  return result.data;
+}
+
 export const sanitySource: ContentSource = {
-  async profile() {
-    const p = await sanityFetch<any>(profileQuery, ["profile"]);
-    if (!p) {
-      throw new Error(
-        "Sanity: 'profile' belgesi bulunamadı. Önce `npm run seed:sanity` ile içeriği taşı ya da yerelde /studio'dan Profil'i doldurup yayımla.",
-      );
+  async profile(mode) {
+    try {
+      return await loadProfile(mode);
+    } catch (error) {
+      // Ziyaretçi davranışı aynı: hata yukarı çıkar. Önizlemede geçersiz bir profil taslağı bütün siteyi düşürmesin;
+      // yayımlanmış sürüm gösterilir ve panelde neden gösterildiği belirtilir.
+      // Yalnızca doğrulama hatasında yayımlanmış sürüme dönülür; ağ ya da token hatası yukarı çıkar (hata sayfası çıkışı sunar).
+      if (!mode.preview || mode.perspective === "published" || !(error instanceof ProfileError)) throw error;
+      console.error("[sanity] taslak profil geçersiz, yayımlanmış sürüm gösteriliyor:", error.message);
+      reportIssue({
+        type: "profile",
+        id: "profile",
+        title: "Profil",
+        field: error.field,
+        message: stegaClean(error.message),
+        fallback: true,
+      });
+      return loadProfile({ preview: true, perspective: "published" });
     }
-    const result = Profile.safeParse({
-      name: p.name,
-      role: p.role,
-      tagline: tr(p.tagline),
-      bio: tr(p.bio),
-      portrait: image(p.portrait, 600, 600),
-      location: tr(p.location),
-      timeZone: p.timeZone,
-      email: p.email,
-      githubUser: p.githubUser,
-      showGithubActivity: p.showGithubActivity ?? true,
-      availability: tr(p.availability),
-      socials: p.socials ?? [],
-      status: (p.status ?? []).map((s: any) => ({ label: tr(s.label), title: tr(s.title), detail: tr(s.detail), tone: s.tone })),
-      workflow: { text: tr(p.workflow?.text), steps: p.workflow?.steps ?? [] },
-    });
-    if (!result.success) throw new Error(`Sanity profil doğrulama hatası:\n${z.prettifyError(result.error)}`);
-    return result.data;
   },
 
-  async technologies() {
-    const docs = await sanityFetch<any[]>(technologiesQuery, ["technology"]);
+  async technologies(mode) {
+    const docs = await sanityFetch<any[]>(technologiesQuery, ["technology"], mode);
     return parseList(
       Technology,
       docs.map((t) => ({ slug: t.slug?.current, name: t.name, categories: t.categories, color: t.color, url: t.url, inStack: t.inStack ?? false })),
       "technology",
+      mode,
+      docs,
     );
   },
 
-  async projects() {
-    const docs = await sanityFetch<any[]>(projectsQuery, ["project", "technology"]);
+  async projects(mode) {
+    const docs = await sanityFetch<any[]>(projectsQuery, ["project", "technology"], mode);
     return parseList(
       Project,
       docs.map((p, i) => {
@@ -135,11 +192,13 @@ export const sanitySource: ContentSource = {
         };
       }),
       "project",
+      mode,
+      docs,
     );
   },
 
-  async experience() {
-    const docs = await sanityFetch<any[]>(experienceQuery, ["experience"]);
+  async experience(mode) {
+    const docs = await sanityFetch<any[]>(experienceQuery, ["experience"], mode);
     return parseList(
       Experience,
       docs.map((e) => ({
@@ -154,11 +213,13 @@ export const sanitySource: ContentSource = {
         tags: e.tags ?? [],
       })),
       "experience",
+      mode,
+      docs,
     );
   },
 
-  async education() {
-    const docs = await sanityFetch<any[]>(educationQuery, ["education"]);
+  async education(mode) {
+    const docs = await sanityFetch<any[]>(educationQuery, ["education"], mode);
     return parseList(
       Education,
       docs.map((e) => ({
@@ -170,6 +231,8 @@ export const sanitySource: ContentSource = {
         note: tr(e.note) || undefined,
       })),
       "education",
+      mode,
+      docs,
     );
   },
 };

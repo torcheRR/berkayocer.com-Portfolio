@@ -5,7 +5,7 @@ export type Contributions = { total: number | null; days: ContributionDay[] };
 
 // GitHub'ın herkese açık katkı takvimini okur (token gerekmez). Günde bir yenilenir.
 // Biçim değişir ya da istek başarısız olursa null döner ve kart gizlenir.
-export async function getContributions(user: string): Promise<Contributions | null> {
+async function fetchContributions(user: string): Promise<Contributions | null> {
   try {
     const res = await fetch(`https://github.com/users/${encodeURIComponent(user)}/contributions`, {
       headers: { "User-Agent": "berkayocer.com" },
@@ -30,4 +30,18 @@ export async function getContributions(user: string): Promise<Contributions | nu
   } catch {
     return null;
   }
+}
+
+// Draft mode fetch önbelleğini (revalidate: 86400) atlar. Önizlemedeki her yenileme GitHub'ı yeniden indirmesin diye
+// sonuç sunucu örneğinde kısa süre tutulur.
+const PREVIEW_TTL_MS = 15 * 60 * 1000;
+const previewMemo = new Map<string, { at: number; value: Promise<Contributions | null> }>();
+
+export function getContributions(user: string, { preview = false }: { preview?: boolean } = {}): Promise<Contributions | null> {
+  if (!preview) return fetchContributions(user);
+  const hit = previewMemo.get(user);
+  if (hit && Date.now() - hit.at < PREVIEW_TTL_MS) return hit.value;
+  const value = fetchContributions(user);
+  previewMemo.set(user, { at: Date.now(), value });
+  return value;
 }
