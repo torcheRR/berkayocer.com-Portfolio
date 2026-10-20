@@ -41,7 +41,7 @@ export function FeaturedWork({
                   <span>{kindLabel[p.kind]}</span>
                 </div>
                 <h3 className="text-[17px] font-medium">
-                  <Link href={`/projeler/${p.slug}`} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+                  <Link href={`/projeler/${p.slug}`} data-card-link className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
                     {p.title}
                   </Link>
                 </h3>

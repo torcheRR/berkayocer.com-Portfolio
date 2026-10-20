@@ -1,23 +1,39 @@
+import { stegaClean } from "next-sanity";
 import { Row } from "@/components/ui/Frame";
 import { SectionHead, Tags } from "@/components/ui/primitives";
 import { experienceTypeLabel, formatPeriod } from "@/lib/content/labels";
 import type { Education, Experience } from "@/lib/content";
 
-type Entry = { key: string; period: string; title: string; summary: string; tags: string[] };
+// Başlıktaki alanlar ayrı span'lerde: önizlemede her biri ayrı tıkla-düzenle hedefi olur.
+type Entry = { key: string; period: string; title: React.ReactNode; summary: string; tags: string[] };
+
+// "İstanbul, Türkiye" -> "İstanbul". Önizlemedeki görünmez işaret sondadır; şehirden sonra geri eklenir ki etiket düzenlenebilsin.
+function cityTag(location: string) {
+  const clean = stegaClean(location);
+  return clean.split(",")[0] + location.slice(clean.length);
+}
 
 export function ExperienceLog({ experience, education }: { experience: Experience[]; education: Education[] }) {
   const entries: Entry[] = [
     ...experience.map((e) => ({
       key: e.id,
       period: formatPeriod(e.start, e.end),
-      title: `${e.company} · ${e.role}`,
+      title: (
+        <>
+          <span>{e.company}</span> · <span>{e.role}</span>
+        </>
+      ),
       summary: e.summary,
-      tags: [...e.tags, e.location.split(",")[0], experienceTypeLabel[e.type]],
+      tags: [...e.tags, cityTag(e.location), experienceTypeLabel[e.type]],
     })),
     ...education.map((ed) => ({
       key: `edu-${ed.school}`,
       period: `${ed.start} – ${ed.end ?? "şimdi"}`,
-      title: `${ed.school} · ${ed.degree}`,
+      title: (
+        <>
+          <span>{ed.school}</span> · <span>{ed.degree}</span>
+        </>
+      ),
       summary: ed.note ?? "",
       tags: [],
     })),

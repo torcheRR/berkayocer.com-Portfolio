@@ -1,3 +1,4 @@
+import { draftMode } from "next/headers";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
@@ -69,6 +70,9 @@ export async function POST(req: Request) {
     }
   }
   if (crossOrigin) return fail("Geçersiz istek.", 403);
+
+  // Önizleme (draft mode) açıkken gerçek e-posta gönderilmez.
+  if ((await draftMode()).isEnabled) return fail("Önizleme modunda form gönderilmez. Önizlemeden çıkıp tekrar dene.", 403);
 
   const now = Date.now();
   const ip = clientIp(req);

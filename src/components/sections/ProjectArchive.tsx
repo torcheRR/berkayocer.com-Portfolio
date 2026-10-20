@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { kindLabel } from "@/lib/content/labels";
 import type { ProjectKind } from "@/lib/content/schemas";
 import { cn } from "@/lib/cn";
@@ -9,6 +9,8 @@ import { cn } from "@/lib/cn";
 type Item = {
   slug: string;
   title: string;
+  // Öznitelikler için temiz başlık (önizlemedeki görünmez işaretler aria-label'a girmesin).
+  label: string;
   summary: string;
   year: number;
   kind: ProjectKind;
@@ -60,7 +62,15 @@ export function ProjectArchive({ items }: { items: Item[] }) {
                   {p.featured ? <span className="font-mono text-[11px] text-mark">öne çıkan</span> : null}
                 </h2>
                 <p className="mt-1 text-[13.5px] text-ink-2">{p.summary}</p>
-                <p className="mt-1.5 font-mono text-[11px] text-ink-3">{p.tech.join(" · ")}</p>
+                <p className="mt-1.5 font-mono text-[11px] text-ink-3">
+                  {/* Her ad ayrı düğüm: önizlemede her teknoloji kendi belgesini açar. */}
+                  {p.tech.map((name, i) => (
+                    <Fragment key={i}>
+                      {i ? " · " : null}
+                      <span>{name}</span>
+                    </Fragment>
+                  ))}
+                </p>
               </div>
               <div className="col-start-2 flex flex-wrap items-start gap-x-3 gap-y-1 font-mono text-xs text-ink-3 sm:col-start-3 sm:flex-col sm:items-end sm:text-right">
                 <span>
@@ -68,12 +78,12 @@ export function ProjectArchive({ items }: { items: Item[] }) {
                 </span>
                 <span className="flex gap-3">
                   {p.repo ? (
-                    <a href={p.repo} target="_blank" rel="noopener noreferrer" className="hover:text-ink" aria-label={`${p.title} kaynak kodu (GitHub)`}>
+                    <a href={p.repo} target="_blank" rel="noopener noreferrer" className="hover:text-ink" aria-label={`${p.label} kaynak kodu (GitHub)`}>
                       Kaynak ↗
                     </a>
                   ) : null}
                   {p.demo ? (
-                    <a href={p.demo} target="_blank" rel="noopener noreferrer" className="hover:text-ink" aria-label={`${p.title} canlı demo`}>
+                    <a href={p.demo} target="_blank" rel="noopener noreferrer" className="hover:text-ink" aria-label={`${p.label} canlı demo`}>
                       Demo ↗
                     </a>
                   ) : null}

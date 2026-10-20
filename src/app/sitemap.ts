@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
-import { getProjects } from "@/lib/content";
+import { getPublishedProjects } from "@/lib/content";
 import { site } from "@/lib/site";
 
+// Site haritası her zaman yayımlanmış içerikten üretilir (önizleme çerezi olsa bile taslak proje girmez).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const projects = await getProjects();
+  const projects = await getPublishedProjects();
   return [
     { url: site.url, changeFrequency: "monthly", priority: 1 },
     { url: `${site.url}/projeler`, changeFrequency: "monthly", priority: 0.8 },

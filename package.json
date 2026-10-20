@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:sanity": "node --env-file-if-exists=.env.local --import tsx scripts/seed-sanity.ts"
+    "seed:sanity": "node --env-file-if-exists=.env.local --import tsx scripts/seed-sanity.ts",
+    "test": "node --test --import tsx \"tests/*.test.ts\"",
+    "check:leaks": "node --env-file-if-exists=.env.local --import tsx scripts/check-public-leaks.ts"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

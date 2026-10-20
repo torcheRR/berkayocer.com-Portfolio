@@ -18,8 +18,13 @@ export function useMotionEnabled() {
   );
 }
 
+// Önizlemede (Presentation iframe'i ya da draft mode) hareket kilitlidir: düzenleme katmanları sabit bir DOM ister.
+// Kilit, sayfa boyanmadan önce <html data-preview> ile konur (bkz. init.ts).
+export const isMotionLocked = () => document.documentElement.hasAttribute("data-preview");
+
+// Sistem ayarı ya da önizleme kilidi hareketi kapatıyorsa ziyaretçi tercihi devre dışıdır (anahtar gizlenir).
 export function systemPrefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return isMotionLocked() || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function storedReduced() {
@@ -38,6 +43,8 @@ export function syncMotionAttribute(reduced = storedReduced()) {
 // Tercih canlı uygulanır: useMotionEnabled özniteliği izler; hareket katmanı kapanırken kendi
 // animasyonlarını geri alır, açılırken yeniden kurulur. Sayfa yenilenmez, odak ve form içeriği korunur.
 export function setMotionPreference(reduced: boolean) {
+  // Önizleme kilidindeyken tercih yazılmaz: localStorage normal sekmelerle ortak.
+  if (isMotionLocked()) return;
   try {
     if (reduced) localStorage.setItem(MOTION_STORAGE_KEY, "reduced");
     else localStorage.removeItem(MOTION_STORAGE_KEY);

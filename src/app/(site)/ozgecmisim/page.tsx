@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Row } from "@/components/ui/Frame";
 import { PrintButton } from "@/components/ui/PrintButton";
 import { getEducation, getExperience, getFeaturedProjects, getProfile, getTechnologies } from "@/lib/content";
@@ -37,7 +38,8 @@ export default async function ResumePage() {
             {profile.name}
           </h1>
           <p className="mt-2 text-ink-2 print:text-neutral-700">
-            {profile.role} · {profile.location}
+            {/* Alanlar ayrı span'lerde: önizlemede her biri ayrı tıkla-düzenle hedefi olur. */}
+            <span>{profile.role}</span> · <span>{profile.location}</span>
           </p>
           <p className="mt-1 font-mono text-xs text-ink-3 print:text-neutral-600">
             {profile.email} · {profile.socials.map((s) => s.url.replace("https://", "").replace("www.", "")).join(" · ")}
@@ -63,7 +65,7 @@ export default async function ResumePage() {
               <span className="font-mono text-xs text-ink-3 print:text-neutral-600">{formatPeriod(e.start, e.end)}</span>
               <div>
                 <h3 className="font-medium">
-                  {e.company} · {e.role}
+                  <span>{e.company}</span> · <span>{e.role}</span>
                 </h3>
                 <p className="text-sm text-ink-3 print:text-neutral-600">{e.location}</p>
                 <p className="mt-1 max-w-[70ch] text-sm text-ink-2 print:text-neutral-800">{e.summary}</p>
@@ -85,8 +87,13 @@ export default async function ResumePage() {
             <div>
               <h3 className="font-medium">{ed.school}</h3>
               <p className="text-sm text-ink-2 print:text-neutral-800">
-                {ed.degree}
-                {ed.gpa ? ` · AGNO ${ed.gpa}` : ""}
+                <span>{ed.degree}</span>
+                {ed.gpa ? (
+                  <>
+                    {" · AGNO "}
+                    <span>{ed.gpa}</span>
+                  </>
+                ) : null}
               </p>
               {ed.note ? <p className="text-sm text-ink-3 print:text-neutral-600">{ed.note}</p> : null}
             </div>
@@ -102,7 +109,14 @@ export default async function ResumePage() {
           {groups.map((g) => (
             <div key={g.category} className="grid gap-1 sm:grid-cols-[150px_1fr] sm:gap-4">
               <dt className="font-mono text-xs text-ink-3 print:text-neutral-600">{categoryLabel[g.category]}</dt>
-              <dd className="text-sm text-ink-2 print:text-neutral-800">{g.items.join(", ")}</dd>
+              <dd className="text-sm text-ink-2 print:text-neutral-800">
+                {g.items.map((name, i) => (
+                  <Fragment key={name}>
+                    {i ? ", " : null}
+                    <span>{name}</span>
+                  </Fragment>
+                ))}
+              </dd>
             </div>
           ))}
         </dl>

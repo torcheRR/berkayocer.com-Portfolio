@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { site } from "@/lib/site";
-import { motionInitScript } from "@/lib/motion/init";
+import { motionInitScript, previewLockScript } from "@/lib/motion/init";
+import { isPreview } from "@/lib/content";
 
 // Kök layout yalnızca html/body ve fontları kurar. Site stilleri (Tailwind) ve skip link
 // (site)/layout.tsx'te; böylece /studio'daki Sanity Studio site CSS'inden etkilenmez.
@@ -45,7 +46,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     // data-motion, boyamadan önce satır içi script ile eklenir; hidrasyon uyarısı bilinçli olarak bastırılır.
     // data-scroll-behavior: Next 16 sayfa geçişlerinde CSS'teki smooth scroll'u yalnızca bu işaret varsa kapatır;
@@ -58,6 +59,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: motionInitScript }} />
+        {/* Önizlemede (draft mode) hareket kilidi her sayfada, istemci kodu çalışmadan önce uygulanır.
+            draftMode() prerender'da false döner; ziyaretçi sayfaları statik kalır. */}
+        {(await isPreview()) ? <script dangerouslySetInnerHTML={{ __html: previewLockScript }} /> : null}
       </head>
       <body>{children}</body>
     </html>

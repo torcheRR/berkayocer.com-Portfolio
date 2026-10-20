@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { setMotionPreference, useMotionEnabled } from "@/lib/motion/preference";
+import { setMotionPreference, systemPrefersReducedMotion, useMotionEnabled } from "@/lib/motion/preference";
 import { cn } from "@/lib/cn";
 
 const subscribeSystem = (cb: () => void) => {
@@ -11,12 +11,13 @@ const subscribeSystem = (cb: () => void) => {
 };
 
 // Footer'daki "Hareketi azalt" anahtarı. Etiket sabittir, durumu aria-pressed ve kutucuk gösterir.
-// Sistem zaten hareketi azaltıyorsa gösterilmez.
+// Sistem zaten hareketi azaltıyorsa ya da önizlemedeysek gösterilmez.
 export function MotionToggle() {
   const enabled = useMotionEnabled();
   const systemReduced = useSyncExternalStore(
     subscribeSystem,
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    // Sistem ayarı ya da önizleme kilidi (data-preview) hareketi kapatıyorsa anahtar gösterilmez.
+    () => systemPrefersReducedMotion(),
     () => true,
   );
   const [message, setMessage] = useState("");

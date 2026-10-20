@@ -48,6 +48,7 @@ UI içeriği yalnızca `src/lib/content` üzerinden okur. Kaynak ortam değişke
    | `NEXT_PUBLIC_SANITY_PROJECT_ID` | Config | Project ID |
    | `NEXT_PUBLIC_SANITY_DATASET` | Config | `production` |
    | `SANITY_REVALIDATE_SECRET` | **Secret** | `openssl rand -hex 32` çıktısı |
+   | `SANITY_API_READ_TOKEN` | **Sensitive** (yalnızca Production) | Viewer yetkili token, bkz. [Önizleme](#önizleme-presentation) |
 
    Sıra önemli: Vercel'e Project ID eklenmeden önce 4. adım tamamlanmış olmalı. Aksi halde build, Sanity'de profil bulamadığı için durur.
 6. **Webhook (anında yayın).** Proje → API → Webhooks → Create:
@@ -59,6 +60,29 @@ UI içeriği yalnızca `src/lib/content` üzerinden okur. Kaynak ortam değişke
    - Secret: 5. adımdaki `SANITY_REVALIDATE_SECRET` ile aynı değer
 
    "Yayınla"dan birkaç saniye sonra değişiklik canlıdadır. Webhook bir kez kaçarsa içerik en geç bir saat içinde kendiliğinden yenilenir.
+
+## Önizleme (Presentation)
+
+`/studio` **Önizleme** aracıyla açılır: solda sitenin taslak hali, sağda belge (dar ekranda sekmeler). Sitede bir metne tıklamak Studio'da o alanı açar. Ziyaretçiler hiçbir şekilde etkilenmez; onlar her zaman önbellekten yayımlanmış içeriği görür.
+
+**Kurulum (bir kez)**
+
+1. Proje → API → Tokens → Add API token → yetki **Viewer**, ad ör. "berkayocer.com önizleme".
+2. Token'ı `.env.local` dosyasına `SANITY_API_READ_TOKEN` olarak, Vercel'e de aynı adla **Sensitive** ve yalnızca **Production** ortamına ekle. Ardından yeniden deploy et.
+3. Cloudflare (DNS proxy açıksa): HTML'i çerezden bağımsız önbelleğe alan bir kural ("Cache Everything", Edge TTL) olmamalı. Bir Cache Rule ile `__prerender_bypass` çerezi varken ve `/studio*`, `/api/*` yollarında önbellek atlanmalı. Rocket Loader ve Email Obfuscation kapalı olmalı; X-Frame-Options/CSP ekleyen bir Transform Rule bulunmamalı.
+
+**Kullanım**
+
+- Studio'da açık olan belge, yazmayı bıraktıktan yaklaşık bir saniye sonra önizlemede yenilenir. Başka belgelerdeki değişiklikler için önizlemenin yenile düğmesini kullan.
+- Önizleme açıkken sitenin normal sekmelerinde de taslaklar görünür; altta **Önizleme** şeridi çıkar ("Studio'da aç", "Önizlemeden çık"). Önizlemeye girmeden önce açık olan site sekmelerini yenile.
+- Doğrulamadan geçemeyen bir taslak sitede gösterilmez; altta "N içerik sitede gösterilemiyor" paneli nedenini yazar, Studio içinde tıklayınca hatalı alanı açar. Profil taslağı geçersizse yayımlanmış profil gösterilir.
+- Önizlemede animasyonlar kapalıdır ve iletişim formu gönderim yapmaz.
+- Her yeni deploy açık önizleme oturumlarını sonlandırır; Studio'dan tekrar açman yeterli.
+- Önizleme yalnızca `https://berkayocer.com/studio` ve `http://localhost:3000/studio` üzerinde çalışır (Vercel preview adreslerinde değil).
+- Bir şey ters giderse hata sayfasındaki **Önizlemeden çık** düğmesi oturumu kapatır.
+- Webhook ayarı değişmez (Drafts kapalı kalır).
+
+**Token yenileme sırası:** yeni Viewer token oluştur → Vercel'de güncelle → yeniden deploy et → eski token'ı iptal et. Ters sıra, deploy bitene kadar açık önizlemeleri hataya düşürür.
 
 ## İletişim formu
 
@@ -78,6 +102,8 @@ UI içeriği yalnızca `src/lib/content` üzerinden okur. Kaynak ortam değişke
 - `npm run build`: production build
 - `npm run lint`: ESLint
 - `npm run seed:sanity`: yerel seed içeriğini Sanity'ye taşır
+- `npm test`: birim testleri (stega izin listesi, yönlendirme ve perspektif kuralları)
+- `npm run check:leaks -- <adres>`: çalışan bir production sunucusunda ziyaretçi sayfalarında önizleme izi ve token sızıntısı olmadığını denetler (varsayılan `http://localhost:3000`). İstemci dosyası taraması yerel build'i (`.next/static`) okur; `npm run build && npm start` sonrası yerel adresle çalıştır.
 
 ## Bilinen davranışlar
 
