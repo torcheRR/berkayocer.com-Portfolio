@@ -1,0 +1,35 @@
+# Her PR'da ve main'e her push'ta lint, tip kontrolü ve birim testleri çalışır.
+# Build ve sızıntı denetimi burada yok: Sanity ortam değişkenleri ve çalışan sunucu ister, CI'a gizli değer eklenmez.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Aynı branch'e yeni push gelince eski çalışma iptal edilir.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      # next-env.d.ts git'te yok; Next'in tip tanımları önce üretilir.
+      - name: Tip kontrolü
+        run: npx next typegen && npx tsc --noEmit
+      - name: Birim testleri
+        run: npm run test --if-present

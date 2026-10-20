@@ -13,6 +13,8 @@ npm run dev
 
 Site `http://localhost:3000`, içerik paneli `http://localhost:3000/studio` adresinde açılır.
 
+Her PR'da ve main'e her push'ta GitHub Actions lint, tip kontrolü ve birim testlerini çalıştırır (`.github/workflows/ci.yml`).
+
 ## İçerik nereden geliyor?
 
 UI içeriği yalnızca `src/lib/content` üzerinden okur. Kaynak ortam değişkenine göre seçilir:
