@@ -1,6 +1,7 @@
 import { draftMode } from "next/headers";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { renderContactEmail } from "@/lib/email/contact-email";
 
 const LIMITS = { name: 100, email: 200, subject: 150, message: 5000 } as const;
 const MIN_MESSAGE = 10;
@@ -148,12 +149,15 @@ export async function POST(req: Request) {
       auth: { user: EMAIL_USER, pass: EMAIL_PASS },
     });
 
+    // Sitenin görünümünde HTML; HTML göstermeyen istemciler için düz metin de gider.
+    const { html, text } = renderContactEmail({ ...clean, sentAt: new Date() });
     await transporter.sendMail({
       from: `Portfolio Form <${EMAIL_USER}>`,
       to: EMAIL_TO || EMAIL_USER,
       subject: `[Portfolio] ${clean.subject}`,
       replyTo: clean.email,
-      text: `Ad Soyad: ${clean.name}\nE-posta: ${clean.email}\n\nMesaj:\n${clean.message}`,
+      text,
+      html,
     });
 
     return NextResponse.json({ ok: true });
